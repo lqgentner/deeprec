@@ -8,7 +8,8 @@ This repository contains the code base accompanying the master's thesis "Reconst
 ## Project structure
 
     .
-    ├── config
+    ├── config                          <- Stores configuration files for data preprocessing, training, and plotting
+    │   ├── global-ensemble_alltrain    <- Configurations of ensemble trained on all available data
     │   ├── global-ensemble_crossval    <- Configurations of cross-validation ensemble
     │   ├── prepocessing_config.yaml    <- Data preprocessing configuration
     │   └── style_paper.mplstyle        <- Matplotlib style sheet for plots
@@ -19,13 +20,12 @@ This repository contains the code base accompanying the master's thesis "Reconst
     │   ├── preprocessing               <- Functions for data preprocessing
     │   ├── accessors.py                <- Custom xarray and pandas "dw" accessors (e.g., use with "DataArray.dw.select_basins()")
     │   └── ...
-    ├── docs                            <- Figures created for the thesis
     ├── jobs                            <- Slurm scripts to train models on the ETHZ Cluster
     ├── models                          <- Model predictions and final products (content excluded from this repository)
     ├── notebooks                       <- Notebooks used for evaluations
     ├── scripts                         <- Scripts for data processing and model training / predicting
     ├── requirements.txt                <- The requirements file for reproducing the analysis environment
-    └── setup.py                        <- makes `deepwaters` pip installable ("pip install -e .")
+    └── pyproject.toml                  <- makes `deepwaters` pip installable ("pip install -e .")
 
 The project structure is based on the [cookiecutter data science project template](https://drivendata.github.io/cookiecutter-data-science/).
 

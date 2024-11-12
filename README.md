@@ -1,6 +1,6 @@
 # DeepWaters: Reconstructing Pre-GRACE Terrestrial Water Storage Anomalies Using Deep Learning
 <p align="center">
-    <img src="docs/figures/cover/steelblue_coastlines_southam_blue.png" alt="Globe of TWS reconstruction" title="Model architecture" width="350"/>
+    <img src="earth_header.png" alt="Globe of TWS reconstruction" title="Model architecture" width="350"/>
 <p align="center">
 
 This repository contains the code base accompanying the master's thesis "Reconstructing Pre-GRACE Terrestrial Water Storage Anomalies Using Deep Learning" (Luis Gentner, 2024). The data processing, model training and evaluation is implemented in Python and heavily depends on the packages [Xarray](https://docs.xarray.dev/en/stable/), [PyTorch](https://pytorch.org/docs/stable/index.html), and [PyTorch Lightning](https://lightning.ai/docs/pytorch/stable/).

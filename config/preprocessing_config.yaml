@@ -1,0 +1,164 @@
+# --------------------------------- INPUTS ------------------------------------
+inputs:
+# WaterGAP
+- files: data/interim/inputs/watergap22e/watergap22e_gswp3-era5_twsa-detrended-5yrs_monthly_1901_2022.nc
+  variables:
+  - name: twsa
+    rename: twsa_gap
+  - name: twsa_detrended_5yrs
+    rename: twsa_gap_detrended_5yrs
+# ERA 5
+- files:
+  - data/raw/inputs/era5-monthly/era5-monthly_2m_dewpoint_temperature_1940-2023.nc
+  - data/raw/inputs/era5-monthly/era5-monthly_2m_temperature_1940-2023.nc
+  - data/raw/inputs/era5-monthly/era5-monthly_evaporation_1940-2023.nc
+  - data/raw/inputs/era5-monthly/era5-monthly_high_vegetation_cover_1940-2023.nc
+  - data/raw/inputs/era5-monthly/era5-monthly_leaf_area_index_high_vegetation_1940-2023.nc
+  - data/raw/inputs/era5-monthly/era5-monthly_leaf_area_index_low_vegetation_1940-2023.nc
+  - data/raw/inputs/era5-monthly/era5-monthly_low_vegetation_cover_1940-2023.nc
+  - data/raw/inputs/era5-monthly/era5-monthly_potential_evaporation_1940-2023.nc
+  - data/raw/inputs/era5-monthly/era5-monthly_runoff_1940-2023.nc
+  - data/raw/inputs/era5-monthly/era5-monthly_sub_surface_runoff_1940-2023.nc
+  - data/raw/inputs/era5-monthly/era5-monthly_surface_pressure_1940-2023.nc
+  - data/raw/inputs/era5-monthly/era5-monthly_surface_runoff_1940-2023.nc
+  - data/raw/inputs/era5-monthly/era5-monthly_total_precipitation_1940-2023.nc
+  - data/raw/inputs/era5-monthly/era5-monthly_volumetric_soil_water_layer_1_1940-2023.nc
+  - data/raw/inputs/era5-monthly/era5-monthly_volumetric_soil_water_layer_2_1940-2023.nc
+  - data/raw/inputs/era5-monthly/era5-monthly_volumetric_soil_water_layer_3_1940-2023.nc
+  - data/raw/inputs/era5-monthly/era5-monthly_volumetric_soil_water_layer_4_1940-2023.nc
+  pipeline:
+  - func: reindex_grid
+  - func: combine_expver
+  # - func: calculate_grace_anomaly
+  variables:
+  - name: d2m
+    rename: era5_d2m
+  - name: t2m
+    rename: era5_t2m
+  - name: e
+    rename: era5_e
+  - name: cvh
+    rename: era5_cvh
+  - name: lai_hv
+    rename: era5_lai_hv
+  - name: lai_lv
+    rename: era5_lai_lv
+  - name: cvl
+    rename: era5_cvl
+  - name: pev
+    rename: era5_pev
+  - name: ro
+    rename: era5_ro
+  - name: ssro
+    rename: era5_ssro
+  - name: sp
+    rename: era5_sp
+  - name: sro
+    rename: era5_sro
+  - name: tp
+    rename: era5_tp
+  - name: swvl1
+    rename: era5_swvl1
+  - name: swvl2
+    rename: era5_swvl2
+  - name: swvl3
+    rename: era5_swvl3
+  - name: swvl4
+    rename: era5_swvl4
+# Landuse
+- files:
+  - data/raw/inputs/landuse/landuse-totals_histsoc_annual_1901_2021.nc
+  - data/raw/inputs/landuse/landuse-urbanareas_histsoc_annual_1901_2021.nc
+  pipeline:
+  - func: yearly2monthly
+  variables:
+  - name: cropland_irrigated
+  - name: cropland_rainfed
+  - name: pastures
+  - name: urbanareas
+# Lakes
+- files: data/raw/inputs/pctlake/pctlake_histsoc_1901_2021.nc
+  pipeline:
+  - yearly2monthly
+  variables:
+  - name: pctlake
+    rename: lakes
+# Glacier mass change
+- files: data/raw/inputs/wgms-fog/wgms-fog_2022-09_global-gridded-annual-glacier-mass-changes.nc
+  pipeline:
+  - yearly2monthly
+  variables:
+  - name: glacier_mass_change_mwe
+    rename: glacier_mass_change
+    pipeline:
+    - func: m2mm
+# Climate indices
+- files: data/raw/inputs/climate-indices/cpc-ersst5-nino-anomalies.nc
+  variables:
+  - name: nino_34
+- files: data/raw/inputs/noaa-ersst-v5/sst.mnmean.nc
+  pipeline:
+  - func: sel_time
+    init_args:
+      start: "1901"
+  variables:
+  - name: sst
+    rename: oni
+    pipeline:
+    - func: calc_oni_from_sst
+# --------------------------------- TARGETS -----------------------------------
+targets:
+# JPL Mascons
+- files: data/raw/targets/jpl-mascons/GRCTellus.JPL.200204_202309.GLO.RL06.1M.MSCNv03CRI.nc
+  pipeline:
+  - func: align_time
+  variables:
+  - name: lwe_thickness
+    rename: twsa_jpl
+    pipeline:
+    - func: cm2mm
+    - func: set_twsa_attrs
+  - name: land_mask
+    rename: land_mask_jpl
+# CSR Mascons
+- files: data/raw/targets/csr-mascons/CSR_GRACE_GRACE-FO_RL0602_Mascons_all-corrections.nc
+  pipeline:
+  - func: coarsen_grid
+  - func: align_time
+  variables:
+  - name: lwe_thickness
+    rename: twsa_csr
+    pipeline:
+    - func: cm2mm
+    - func: set_twsa_attrs
+# GSFC Mascons
+- files: data/raw/targets/gsfc-mascons/gsfc.glb_.200204_202309_rl06v2.0_obp-ice6gd_halfdegree.nc
+  pipeline:
+  - func: align_time
+  variables:
+  - name: lwe_thickness
+    rename: twsa_gsfc
+    pipeline:
+    - func: cm2mm
+    - func: set_twsa_attrs
+  - name: land_mask
+    rename: land_mask_gsfc
+# --------------------------- FEATURE ENGINEERING -----------------------------
+engineering:
+  pipeline:
+  - func: add_nvector
+  - func: add_epoch_time
+  - func: add_periodic_time
+    init_args:
+      freq: 1
+  - func: add_periodic_time
+    init_args:
+      freq: 2
+  - func: add_cell_area
+  - func: add_country_exclusion_mask
+    init_args:
+      country_names:
+      - Antarctica
+      - Greenland
+      buffer_distance: 4e5
+      var_name: grl_ata_mask

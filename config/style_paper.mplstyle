@@ -1,0 +1,50 @@
+# Custom Matplotlib style to use for generating print-quality plots
+
+figure.constrained_layout.use: True
+figure.facecolor: white
+axes.linewidth: 0.5
+grid.linewidth: 0.5
+lines.linewidth: 1.2
+lines.markersize: 4.8
+patch.linewidth: 0.8
+xtick.major.width: 0.5
+ytick.major.width: 0.5
+xtick.minor.width: 0.5
+ytick.minor.width: 0.5
+xtick.major.size: 2.4
+ytick.major.size: 2.4
+xtick.minor.size: 1.6
+ytick.minor.size: 1.6
+font.size: 8.0
+axes.titleweight: bold
+# Only lower and right border
+axes.spines.right: False
+axes.spines.top: False
+axes.axisbelow: True
+xtick.direction: out
+ytick.direction: out
+grid.linestyle: -
+grid.color: lightgray
+lines.solid_capstyle: round
+# lines.markeredgecolor: w
+lines.markeredgewidth: 0.8
+patch.edgecolor: w
+patch.force_edgecolor: True
+# Remove legend frame
+legend.frameon: False
+legend.framealpha: 1.0
+# Use white background and edges, if legend frame is switched on
+legend.fancybox: False
+legend.edgecolor: w
+# Save figure
+savefig.bbox: tight
+savefig.pad_inches: 0.05
+savefig.dpi: 450
+# Use inline math for ticks
+text.usetex: True
+# Matplotlib-intern latex preamble (pdflatex)
+text.latex.preamble: \usepackage[T1]{fontenc} \usepackage[utf8]{inputenc} \usepackage{siunitx} \sisetup{detect-all} \usepackage{tgheros} \usepackage[scaled=1.06]{newtxsf} \renewcommand{\familydefault}{\sfdefault} \usepackage{mathastext}
+# Configure PGF
+pgf.texsystem: pdflatex
+pgf.rcfonts: False
+pgf.preamble: \usepackage[T1]{fontenc} \usepackage[utf8]{inputenc} \usepackage{siunitx} \sisetup{detect-all} \usepackage{tgheros} \usepackage[scaled=1.06]{newtxsf} \renewcommand{\familydefault}{\sfdefault} \usepackage{mathastext}

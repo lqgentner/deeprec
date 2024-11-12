@@ -1,0 +1,108 @@
+scenario: Ensemble-NLL-Laplace-Fold5
+trainer:
+  default_root_dir: models/trained/global
+  max_epochs: 30
+  accelerator: gpu
+  sync_batchnorm: True
+  logger:
+    class_path: lightning.pytorch.loggers.WandbLogger
+    init_args:
+      save_dir: ${trainer.default_root_dir}/logs
+      project: deepwaters_global_ensemble
+      log_model: all
+  callbacks:
+    - class_path: lightning.pytorch.callbacks.LearningRateMonitor
+    - class_path: lightning.pytorch.callbacks.ModelCheckpoint
+      init_args:
+        dirpath: "${trainer.default_root_dir}/checkpoints"
+        monitor: val_loss
+        save_last: true
+        filename: "epoch_{epoch:03d}"
+    - class_path: lightning.pytorch.callbacks.RichModelSummary
+      init_args:
+        max_depth: -1
+    - class_path: lightning.pytorch.callbacks.RichProgressBar
+
+optimizer:
+  class_path: torch.optim.AdamW
+  init_args:
+    lr: 1e-4
+    weight_decay: 1e-5
+
+lr_scheduler:
+  class_path: deepwaters.lr_scheduler.LinearWarmupCosineAnnealingLR
+  init_args:
+    warmup_epochs: 5
+    max_epochs: ${trainer.max_epochs}
+    warmup_start_lr: 1e-6
+    eta_min: 1e-8
+
+model:
+  class_path: deepwaters.models.rnn.CropResNetLSTM
+  init_args:
+    weight_lat: true
+    loss: nll_laplace
+    cnn_channel_mult: 1.5
+    rnn_layers: 1
+    rnn_hidden_size: 128
+    rnn_dropout: 0.0
+    # Linked variables
+    n_tensor_inps: ${len:${data.tensor_input_vars}}
+    n_matrix_inps: ${len:${data.matrix_input_vars}}
+    n_vector_inps: ${len:${data.vector_input_vars}}
+
+data:
+  data_dir:  data/processed
+  val_split:
+  - 2018-06-01
+  - 2021-12-01
+  train_split:
+  - 2002-04-01
+  - 2021-12-01
+  #----------------
+  scale_method: robust
+  coverage:
+    data_vars:
+    - land_mask_jpl
+    - land_mask_gsfc
+    - grl_ata_mask
+  target_var: twsa_csr
+  tensor_input_vars:
+  - era5_d2m
+  - era5_t2m
+  - era5_e
+  - era5_cvh
+  - era5_cvl
+  - era5_lai_hv
+  - era5_lai_lv
+  - era5_pev
+  - era5_ro
+  - era5_sro
+  - era5_ssro
+  - era5_sp
+  - era5_tp
+  - era5_swvl1
+  - era5_swvl2
+  - era5_swvl3
+  - era5_swvl4
+  matrix_input_vars:
+  - nvec_x
+  - nvec_y
+  - nvec_z
+  - cell_area
+  - cropland_irrigated
+  - cropland_rainfed
+  - pastures
+  - urbanareas
+  - lakes
+  vector_input_vars:
+  - year_sin
+  - year_cos
+  - year2_sin
+  - year2_cos
+  - oni
+  space_window: 35
+  time_window: 12
+  batch_size: 256
+  num_workers: 8
+  persistent_workers: true

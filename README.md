@@ -44,14 +44,21 @@ Create a new virtual environment:
     cd deepwaters
     python -m venv .venv
 
-Activate the virtual environment. On Windows, use:
+Activate the virtual environment. On Windows, run one of the following scripts:
 
+    # In cmd.exe
     .venv\Scripts\activate.bat
+    # In PowerShell
+    .venv\Scripts\Activate.ps1
 
-Install all package dependencies. To exactly replicate this analysis, you can install the same package versions:
+On Linux or macOS, use the source command:
 
-    pip install -r requirements.txt
+    source .venv/bin/activate
 
-In case you installed the packages manually, make sure that `deepwaters`, the package included in this repository, is installed. If you want to make changes to the repository, install `deepwaters` as an editable package:
+Now you can install `deepwaters` as editable package. This also installs all dependencies for the DeepWaters package as well as running all scripts (data download, preprocessing, and model training).
 
     pip install -e .
+
+If you additionally want to run the notebooks used to create the plots of the evaluations, install the optional dependencies with:
+
+    pip install -e ".[interactive]"

@@ -1,0 +1,56 @@
+\documentclass[tikz,border=3mm]{standalone}
+\usetikzlibrary{arrows.meta}
+\usepackage{mathtools}
+
+\begin{document}
+
+\definecolor{tabBlue}{HTML}{1f77b4}
+\definecolor{tabOrange}{HTML}{ff7f0e}
+\definecolor{tabGreen}{HTML}{2ca02c}
+\definecolor{tabRed}{HTML}{d62728}
+\definecolor{tabPurple}{HTML}{9467bd}
+\definecolor{tabBrown}{HTML}{8c564b}
+\definecolor{tabPink}{HTML}{e377c2}
+\definecolor{tabGray}{HTML}{7f7f7f}
+\definecolor{tabOlive}{HTML}{bcbd22}
+\definecolor{tabCyan}{HTML}{17becf}
+
+\begin{tikzpicture}[>={Stealth[inset=0pt,length=5pt]},
+    thick,
+    declare function={
+        laplace(\x,\mu,\b)=1/(2*\b)*exp(-abs(\x-\mu)/\b);
+        % Original parameters
+        mu1=0;    b1=0.5;
+        mu2=-0.25; b2=0.4;
+        mu3=-0.75;   b3=0.6;
+        mu4=0.25; b4=1;
+        mu5=-0.2; b5=0.6;
+        % opacity
+        o=0.4;
+        % Coefficients for linear combination
+        c1=0.2;
+        c2=0.2;
+        c3=0.2;
+        c4=0.2;
+        c5=0.2;
+        % Combined function
+        mixture(\x)=c1*laplace(\x,mu1,b1) + 
+                   c2*laplace(\x,mu2,b2) +
+                   c3*laplace(\x,mu3,b3) +
+                   c4*laplace(\x,mu4,b4) +
+                   c5*laplace(\x,mu5,b5);
+        xmax=2;
+        ymax=2;
+    }]
+    
+    % Shaded area under the entire curve
+    \fill[tabCyan, opacity=o] plot[domain=-xmax:xmax,samples=150,smooth] 
+    (\x,{laplace(\x,mu4,b4)}) -- (xmax,0) -| (-xmax,0) -- cycle;
+    
+    % Main distribution curve
+    \draw[tabCyan] plot[domain=-xmax:xmax,samples=200,smooth] (\x,{laplace(\x,mu4,b4)});
+    
+    % x-axis
+    \draw[tabGray!50] (-xmax,0) edge[->] (xmax+0.18,0);
+\end{tikzpicture}
+\end{document}

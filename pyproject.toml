@@ -1,6 +1,6 @@
 [project]
-name = "deepwaters"
-version = "0.1.0"
+name = "deeprec"
+version = "0.2.0"
 authors = [
   { name="Luis Quentin Gentner", email="luis.gentner@outlook.com" },
 ]
@@ -8,32 +8,40 @@ description = "Reconstructing Pre-GRACE Terrestrial Water Storage Anomalies Usin
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "cartopy>=0.24.1",
-    "cdsapi>=0.7.4",
-    "cf-xarray>=0.10.0",
-    "dask>=2024.11.1",
-    "geopandas>=1.0.1",
-    "isimip-client>=1.0.1",
-    "lightning>=2.4.0",
-    "matplotlib>=3.9.2",
-    "omegaconf>=2.3.0",
-    "pyjanitor>=0.29.2",
-    "regionmask>=0.12.1",
-    "rioxarray>=0.18.1",
-    "ruamel-yaml>=0.18.6",
-    "scikit-learn>=1.5.2",
-    "tabulate>=0.9.0",
-    "torch>=2.5.1",
-    "torchinfo>=1.8.0",
-    "tqdm>=4.67.0",
-    "wandb>=0.18.6",
-    "xarray[complete]>=2024.10.0",
-    "xskillscore>=0.0.26",
-    "zarr>=2.18.3",
+    "cartopy",
+    "cf-xarray",
+    "dask",
+    "geopandas",
+    "isimip-client",
+    "lightning",
+    "matplotlib",
+    "numpy",
+    "omegaconf",
+    "pandas",
+    "pyjanitor",
+    "jsonargparse[signatures]>=4.34",
+    "regionmask",
+    "requests",
+    "rich",
+    "rioxarray",
+    "ruamel-yaml",
+    "scikit-learn",
+    "statsmodels",
+    "shapely",
+    "shxarray",
+    "tabulate",
+    "torch",
+    "torchinfo",
+    "tqdm",
+    "wandb",
+    "xarray[complete]",
+    "xskillscore",
+    "zarr",
 ]
 
 [project.optional-dependencies]
 interactive = ["ipykernel", "matplotlib-inline", "seaborn"]
+download = ["podaac-data-subscriber", "cdsapi", "isimip-client"]
 
 [tool.setuptools]
-packages = ["deepwaters"]
+packages = ["deeprec"]

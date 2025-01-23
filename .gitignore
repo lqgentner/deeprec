@@ -80,10 +80,9 @@ target/
 # Jupyter NB Checkpoints
 .ipynb_checkpoints/
 
-# Exclude data, models and output figures
+# Exclude data and models
 /data/
 /models/
-/docs/
 
 # Mac OS-specific storage files
 .DS_Store

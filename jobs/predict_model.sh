@@ -12,7 +12,7 @@
 #SBATCH --signal=SIGINT@300
 
 # Go to repository
-cd /cluster/home/lgentner/repositories/deep-waters/
+cd /cluster/scratch/lgentner/repositories/deeprec/
 
 # Load modules
 module load stack/2024-06 python_cuda/3.11.6 eth_proxy
@@ -20,9 +20,10 @@ module load stack/2024-06 python_cuda/3.11.6 eth_proxy
 # Activate venv
 source .venv/bin/activate
 
-# debugging flags (optional)
-export NCCL_DEBUG=INFO
+# debugging flags
+export LOGLEVEL=INFO
+export NCCL_DEBUG=WARN
 export PYTHONFAULTHANDLER=1
 
 # run script from above
-srun python scripts/6-model-prediction.py lgentner/deepwaters_global_ensemble o6xwtzza -a latest -s models/predictions/global/ensemble_alltrain_gap_lnll_10folds.zarr
+srun python scripts/6-model-predict.py lgentner/deeprec-paper_ensembles tihk28jt -a v15 -s models/predictions/ensemble_era_best-loss.zarr

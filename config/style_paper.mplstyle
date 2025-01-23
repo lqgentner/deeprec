@@ -45,6 +45,7 @@ text.usetex: True
 # Matplotlib-intern latex preamble (pdflatex)
 text.latex.preamble: \usepackage[T1]{fontenc} \usepackage[utf8]{inputenc} \usepackage{siunitx} \sisetup{detect-all} \usepackage{tgheros} \usepackage[scaled=1.06]{newtxsf} \renewcommand{\familydefault}{\sfdefault} \usepackage{mathastext}
 # Configure PGF
-pgf.texsystem: pdflatex
+pgf.texsystem: lualatex
 pgf.rcfonts: False
-pgf.preamble: \usepackage[T1]{fontenc} \usepackage[utf8]{inputenc} \usepackage{siunitx} \sisetup{detect-all} \usepackage{tgheros} \usepackage[scaled=1.06]{newtxsf} \renewcommand{\familydefault}{\sfdefault} \usepackage{mathastext}
+# Use TeX Gyre Heros as main+sans font and as math font with mathastext, replace missing symbols from newtxsf
+pgf.preamble: \usepackage[no-math]{fontspec} \usepackage{amsmath, siunitx} \setmainfont{TeX Gyre Heros} \setsansfont{TeX Gyre Heros} \usepackage[scaled=1.06]{newtxsf} \usepackage[italic]{mathastext} \sisetup{detect-all}

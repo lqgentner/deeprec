@@ -64,3 +64,5 @@ If you want to download the input and model data sets required for model trainin
     pip install -e ".[download]"
     # For running the notebooks
     pip install -e ".[interactive]"
+    # For installing all optional dependencies
+    pip install -e ".[complete]"

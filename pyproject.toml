@@ -28,7 +28,6 @@ dependencies = [
     "scikit-learn",
     "statsmodels",
     "shapely",
-    "shxarray",
     "tabulate",
     "torch",
     "torchinfo",
@@ -42,6 +41,7 @@ dependencies = [
 [project.optional-dependencies]
 interactive = ["ipykernel", "matplotlib-inline", "seaborn"]
 download = ["podaac-data-subscriber", "cdsapi", "isimip-client"]
+complete = ["deeprec[interactive, download]"]
 
 [tool.setuptools]
 packages = ["deeprec"]

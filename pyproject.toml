@@ -39,9 +39,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-interactive = ["ipykernel", "matplotlib-inline", "seaborn"]
 download = ["podaac-data-subscriber", "cdsapi", "isimip-client"]
-complete = ["deeprec[interactive, download]"]
+plot = ["ipykernel", "matplotlib-inline", "seaborn", "cmcrameri"]
+complete = ["deeprec[download, plot]"]
 
 [tool.setuptools]
 packages = ["deeprec"]

@@ -595,7 +595,7 @@ class XrDatasetAccessor(XrBaseAccessor):
     def time_notnull(self, dims: str | list[str] | None = None) -> xr.DataArray:
         """Test each time step in a Dataset whether it is NA for all values of
         the specified dimension(s) for at least one data variable."""
-        # Check over spatial dimensions if dims is not specified
+        # Check over spatial dimensions if dims are not specified
         if dims is None:
             dims = ["lat", "lon"]
 

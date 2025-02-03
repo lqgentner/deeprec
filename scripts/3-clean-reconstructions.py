@@ -41,6 +41,8 @@ def main():
     yin_csr = yin_dir / "CSR-based GTWS-MLrec TWS.nc"
     yin_jpl = yin_dir / "JPL-based GTWS-MLrec TWS.nc"
 
+    palazzoli_jpl = ROOT_DIR / "data/raw/reconstructions/palazzoli/GRAiCE_BiLSTM.nc"
+
     # Perform cleaning
     print("Prepare reconstructions...")
     ds_list = [
@@ -50,6 +52,7 @@ def main():
         clean_yin(yin_gsfc, "gsfc"),
         clean_yin(yin_csr, "csr"),
         clean_yin(yin_jpl, "jpl"),
+        clean_palazzoli(palazzoli_jpl, "jpl"),
     ]
     recs = xr.merge(ds_list).chunk(CHUNKS).astype("float32")
 
@@ -143,7 +146,7 @@ def clean_yin(file: Path, target_name: str) -> xr.Dataset:
     # Workaround for different grid cell steps
     ds = ds.assign(lat=ds.lat - 0.125, lon=ds.lon + 0.125)
 
-    # Fill missing land areas with zeros
+    # Fill missing values over land with zeros
     # (Land is what both JPL and GSFC define as land)
     targets_zarr = ROOT_DIR / "data/processed/targets.zarr"
     tgts = xr.open_zarr(targets_zarr)
@@ -154,6 +157,18 @@ def clean_yin(file: Path, target_name: str) -> xr.Dataset:
         twsa=f"yin_{target_name}_full",
         twsa_zerofill=f"yin_{target_name}_zerofill",
     )
+    # Calculate the GRACE anomaly (2004 - 2009)
+    ds = calculate_grace_anomaly(ds)
+
+    return ds
+
+
+def clean_palazzoli(file: Path, target_name: str) -> xr.Dataset:
+    """Clean Palazzoli's reconstructions"""
+    ds = xr.open_dataset(file)
+    ds = ds.chunk(CHUNKS).assign_coords(lon=(ds.lon + 180) % 360 - 180).sortby("lon")
+
+    ds = ds.rename(TWSA=f"palazzoli_{target_name}_full")
     # Calculate the GRACE anomaly (2004 - 2009)
     ds = calculate_grace_anomaly(ds)
 

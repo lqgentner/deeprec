@@ -36,6 +36,7 @@ dependencies = [
     "xarray[complete]",
     "xskillscore",
     "zarr",
+    "openpyxl",
 ]
 
 [project.optional-dependencies]

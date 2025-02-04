@@ -73,6 +73,8 @@ def clean_humphrey(file: Path, target_name: str) -> xr.Dataset:
     ds = xr.open_dataset(file).chunk(CHUNKS)
     # Time: 15th to 1st of month
     ds["time"] = ds.get_index("time") - pd.offsets.MonthBegin()
+    # Convert lat from [-90, 90] to [90, -90]
+    ds = ds.reindex(lat=-ds.lat)
     ds = (
         ds.assign(rec_detrend=ds.rec_ensemble_mean + ds.rec_seasonal_cycle)
         .drop_vars(["rec_ensemble_p05", "rec_ensemble_p95", "rec_seasonal_cycle"])
@@ -166,7 +168,8 @@ def clean_yin(file: Path, target_name: str) -> xr.Dataset:
 def clean_palazzoli(file: Path, target_name: str) -> xr.Dataset:
     """Clean Palazzoli's reconstructions"""
     ds = xr.open_dataset(file)
-    ds = ds.chunk(CHUNKS).assign_coords(lon=(ds.lon + 180) % 360 - 180).sortby("lon")
+    # Centimeters to millimeters
+    ds *= 10
 
     ds = ds.rename(TWSA=f"palazzoli_{target_name}_full")
     # Calculate the GRACE anomaly (2004 - 2009)

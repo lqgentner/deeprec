@@ -12,6 +12,8 @@ annotated-types==0.7.0
     # via pydantic
 antlr4-python3-runtime==4.9.3
     # via omegaconf
+asciitree==0.3.3
+    # via zarr
 attrs==24.3.0
     # via
     #   aiohttp
@@ -65,8 +67,6 @@ contourpy==1.3.1
     # via
     #   bokeh
     #   matplotlib
-crc32c==2.7.1
-    # via numcodecs
 cycler==0.12.1
     # via matplotlib
 dask==2025.1.0
@@ -84,10 +84,10 @@ docker-pycreds==0.4.0
     # via wandb
 docstring-parser==0.16
     # via jsonargparse
-donfig==0.8.1.post1
-    # via zarr
 et-xmlfile==2.0.0
     # via openpyxl
+fasteners==0.19
+    # via zarr
 filelock==3.17.0
     # via torch
 flox==0.9.15
@@ -259,7 +259,6 @@ packaging==24.2
     #   statsmodels
     #   torchmetrics
     #   xarray
-    #   zarr
 pandas==2.2.3
     # via
     #   deeprec (pyproject.toml)
@@ -337,7 +336,6 @@ pyyaml==6.0.2
     #   bokeh
     #   dask
     #   distributed
-    #   donfig
     #   jsonargparse
     #   lightning
     #   omegaconf
@@ -452,7 +450,6 @@ typing-extensions==4.12.2
     #   torch
     #   typeshed-client
     #   wandb
-    #   zarr
 tzdata==2025.1
     # via pandas
 urllib3==2.3.0
@@ -481,7 +478,7 @@ xyzservices==2025.1.0
     # via bokeh
 yarl==1.18.3
     # via aiohttp
-zarr==3.0.1
+zarr==2.18.4
     # via
     #   deeprec (pyproject.toml)
     #   xarray

@@ -35,7 +35,7 @@ dependencies = [
     "wandb",
     "xarray[complete]",
     "xskillscore",
-    "zarr",
+    "zarr>=2,<3",
     "openpyxl",
 ]
 

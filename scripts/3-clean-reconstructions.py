@@ -37,9 +37,9 @@ def main():
     li_csr = ROOT_DIR / "data/raw/reconstructions/li/GRID_CSR_GRACE_REC.mat"
 
     yin_dir = ROOT_DIR / "data/raw/reconstructions/yin"
-    yin_gsfc = yin_dir / "GSFC-based GTWS-MLrec TWS.nc"
-    yin_csr = yin_dir / "CSR-based GTWS-MLrec TWS.nc"
-    yin_jpl = yin_dir / "JPL-based GTWS-MLrec TWS.nc"
+    yin_gsfc = yin_dir / "GSFC-based%20GTWS-MLrec%20TWS.nc"
+    yin_csr = yin_dir / "CSR-based%20GTWS-MLrec%20TWS.nc"
+    yin_jpl = yin_dir / "JPL-based%20GTWS-MLrec%20TWS.nc"
 
     palazzoli_jpl = ROOT_DIR / "data/raw/reconstructions/palazzoli/GRAiCE_BiLSTM.nc"
 

@@ -1,0 +1,99 @@
+# DeepRec Attributes YAML for "era-rdcd" configuration
+
+# Location of input Zarr store
+in_store: models/predictions/ensemble-mixed/ensemble-mixed_era-rdcd_best-mae.zarr
+# Directory of output netCDF file
+out_dir: models/final-products
+
+# Coordinate attributes
+coordinates:
+  time:
+    standard_name: time
+    long_name: Time
+    axis: T
+    coverage_content_type: coordinate
+  
+  lat:
+    standard_name: latitude
+    long_name: Latitude
+    units: degrees_north
+    axis: Y
+    coverage_content_type: coordinate
+  
+  lon:
+    standard_name: longitude
+    long_name: Longitude
+    units: degrees_east
+    axis: X
+    coverage_content_type: coordinate
+
+# Variable attributes
+data_variables:
+  twsa:
+    standard_name: lwe_thickness
+    long_name: TWS anomaly in liquid water equivalent thickness
+    units: cm
+    coverage_content_type: modelResult
+  
+  sigma:
+    standard_name: uncertainty_total
+    long_name: Total uncertainty
+    units: cm
+    comment: 1-sigma uncertainty, obtained using a deep ensemble with 5 members
+    coverage_content_type: modelResult
+  
+  sigma_ale:
+    standard_name: uncertainty_aleatoric
+    long_name: Aleatoric uncertainty
+    units: cm
+    comment: 1-sigma uncertainty, obtained using a deep ensemble with 5 members
+    coverage_content_type: modelResult
+  
+  sigma_epi:
+    standard_name: uncertainty_epistemic
+    long_name: Epistemic uncertainty
+    units: cm
+    comment: 1-sigma uncertainty, obtained using a deep ensemble with 5 members
+    coverage_content_type: modelResult
+
+# Dataset attributes
+dataset:
+  title: DeepRec_CSR_ERA5x4+HI_ensemble-mixture
+  summary: Reconstructed TWS anomalies using CSR GRACE/GRACE-FO mascon solutions as target
+  keywords: GRACE, gravity, terrestrial water storage anomaly
+  Conventions: ACDD-1.3
+  product_version: v0.1
+  source: DeepRec
+  institution: Institute of Geodesy and Photogrammetry, ETH Zurich, Switzerland
+  creator_name: Luis Q. Gentner
+  creator_email: luis.gentner@outlook.com
+  creator_type: person
+  time_coverage_resolution: P1M
+  time_mean_removed: 2004.000 to 2009.999
+  geospatial_lat_units: degree_north
+  geospatial_lat_resolution: 0.5 degree
+  geospatial_lon_units: degree_east
+  geospatial_lon_resolution: 0.5 degree
+  model_target: CSR GRACE/GRACE-FO RL06.3 mascon solutions with all corrections
+  model_input: >-
+    ERA5 single levels monthly means (sd, sp, t2m, tp),
+    ISIMIP land use (irrigated cropland, rainfed cropland, pastures, urban areas),
+    ISIMIP lake area fraction,
+    NOAA ERSSTv5 Oceanic Niño Index
+  comment: >-
+    The ground truth of this reconstruction, the CSR GRACE RL06.3 mascon product,
+    was downsampled to 0.5° before it was used.
+    Only grid cells were reconstructed that are classified as land by CSR, JPL and
+    GSFC land masks (intersection) and are not part of Greenland or Antarctica.
+
+# Encoding
+encoding:
+  general:
+    dtype: float32
+    zlib: true
+    complevel: 6
+  time:
+    dtype: float32
+    units: hours since 1901-01-01T00:00:00Z
+    calendar: gregorian
+

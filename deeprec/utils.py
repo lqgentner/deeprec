@@ -26,7 +26,7 @@ def download_file(url, path):
     filename = url.rsplit("/")[-1]
     # Ensure path is pathlib object
     path = Path(path)
-    path.mkdir(exist_ok=True)
+    path.mkdir(exist_ok=True, parents=True)
     filepath = Path(path) / filename
     response = requests.get(url, timeout=10)
     with open(filepath, mode="wb") as file:

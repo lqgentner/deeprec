@@ -341,8 +341,8 @@ def add_periodic_time(ds: xr.Dataset, freq: int = 1) -> xr.Dataset:
     varname_sin = "year_sin" if freq == 1 else f"year{freq}_sin"
     # Assign new data variables
     doy = ds.time.dt.dayofyear
-    ds[varname_cos] = np.cos(freq * doy * 2 * np.pi / 365)
-    ds[varname_sin] = np.sin(freq * doy * 2 * np.pi / 365)
+    ds[varname_cos] = np.cos(freq * doy * 2 * np.pi / 365.25)
+    ds[varname_sin] = np.sin(freq * doy * 2 * np.pi / 365.25)
     # Create attributes
     ds[varname_cos].attrs = {
         "standard_name": f"cosine_of_time_{freq}_per_year",

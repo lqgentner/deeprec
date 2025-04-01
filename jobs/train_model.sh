@@ -26,4 +26,4 @@ export NCCL_DEBUG=WARN
 export PYTHONFAULTHANDLER=1
 
 # run script from above
-srun python scripts/4-model-train.py --config config/model-configs/train_1-era-rdcd.yaml
+srun python scripts/4-model-train.py --config config/model-configs/train-era.yaml

@@ -40,9 +40,26 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-download = ["podaac-data-subscriber", "cdsapi", "isimip-client"]
-plot = ["ipykernel", "matplotlib-inline", "seaborn", "cmcrameri"]
+download = [
+    "podaac-data-subscriber",
+    "cdsapi",
+    "isimip-client",
+]
+plot = [
+    "ipykernel",
+    "matplotlib-inline",
+    "seaborn",
+    "cmcrameri",
+]
 complete = ["deeprec[download, plot]"]
 
 [tool.setuptools]
 packages = ["deeprec"]
+
+[tool.uv.sources]
+deeprec = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "deeprec",
+]

@@ -16,7 +16,7 @@ import dask
 import xarray as xr
 import zarr
 from dask.diagnostics import ProgressBar
-from ruamel.yaml import YAML
+from omegaconf import OmegaConf
 from tqdm.std import tqdm
 
 from deeprec.preprocessing import preprocessors as pp
@@ -36,13 +36,12 @@ def main() -> None:
     )
     parser.add_argument(
         "config_file",
-        type=argparse.FileType("r"),
         help="Location of the configuration YAML.",
     )
     args = parser.parse_args()
 
     # Load configs
-    config_dict = YAML().load(args.config_file)
+    config_dict = dict(OmegaConf.load(args.config_file))
 
     out_dir = Path(config_dict["out_dir"])
     config_inps: list[dict] = config_dict["inputs"]

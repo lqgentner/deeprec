@@ -24,7 +24,6 @@ dependencies = [
     "requests",
     "rich",
     "rioxarray",
-    "ruamel-yaml",
     "scikit-learn",
     "statsmodels",
     "shapely",

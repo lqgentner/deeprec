@@ -1,7 +1,7 @@
-# DeepRec Attributes YAML for "era" configuration
+# DeepRec Attributes YAML for "era-rdcd" configuration
 
 # Location of input Zarr store
-in_store: models/predictions/ensemble-mixed/ensemble-mixed_era_best-mae.zarr
+in_store: models/predictions/ensemble-mixed/ensemble-mixed_era-rdcd_best-mae.zarr
 # Directory of output netCDF file
 out_dir: models/final-products
 
@@ -58,7 +58,7 @@ data_variables:
 
 # Dataset attributes
 dataset:
-  title: DeepRec_CSR_ERA5x14+HI_ensemble-mixture
+  title: DeepRec_mixture_CSR_ERA5rdcd-ONI-HI
   summary: Reconstructed TWS anomalies, ensemble mixture
   keywords: GRACE, gravity, terrestrial water storage anomaly
   Conventions: ACDD-1.3
@@ -76,7 +76,7 @@ dataset:
   geospatial_lon_resolution: 0.5 degree
   model_target: CSR GRACE/GRACE-FO RL06.3 mascon solutions with all corrections
   model_input: >-
-    ERA5 single levels monthly means (d2m, e, lai_hv, lai_lv, pev, sp, sro, ssro, swvl1, swvl2, swvl3, swvl4, t2m, tp),
+    ERA5 single levels monthly means (sd, sp, t2m, tp),
     ISIMIP land use (irrigated cropland, rainfed cropland, pastures, urban areas),
     ISIMIP lake area fraction,
     NOAA ERSSTv5 Oceanic Niño Index

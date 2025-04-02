@@ -51,7 +51,7 @@ data_variables:
 
 # Dataset attributes
 dataset:
-  title: DeepRec_CSR_ERA5x14+HI_ensemble-members
+  title: DeepRec_members_CSR_ERA5-ONI-HI
   summary: Reconstructed TWS anomalies, individual model outputs
   keywords: GRACE, gravity, terrestrial water storage anomaly
   Conventions: ACDD-1.3

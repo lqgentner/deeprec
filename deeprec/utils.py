@@ -7,7 +7,7 @@ from datetime import datetime
 from importlib import reload
 from math import floor
 from pathlib import Path
-from typing import Literal, TypeVar
+from typing import Any, Literal, TypeVar
 
 import pandas as pd
 import requests
@@ -21,21 +21,21 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 XrObj = TypeVar("XrObj", xr.Dataset, xr.DataArray)
 
 
-def download_file(url, path):
+def download_file(url: str, path: str, timeout: float = 5.0, **get_kwargs):
     """Downloads a file from a provided URL"""
     filename = url.rsplit("/")[-1]
     # Ensure path is pathlib object
     path = Path(path)
     path.mkdir(exist_ok=True, parents=True)
     filepath = Path(path) / filename
-    response = requests.get(url, timeout=10)
+    response = requests.get(url, timeout=timeout, **get_kwargs)
     with open(filepath, mode="wb") as file:
         file.write(response.content)
 
 
-def download_zip(url, path):
+def download_zip(url: str, path: str, timeout: float = 5.0, **get_kwargs):
     """Downloads and unzips an archive from a provided URL"""
-    request = requests.get(url=url, timeout=10)
+    request = requests.get(url=url, timeout=timeout, **get_kwargs)
     zip_file = zipfile.ZipFile(io.BytesIO(request.content))
     zip_file.extractall(path=path)
 
@@ -137,3 +137,42 @@ def repeat_by_weight(df: pd.DataFrame, weight_col: str) -> pd.DataFrame:
     """Repeat rows in a DataFrame according to the integer values of a weight column"""
     df = df.reindex(df.index.repeat(df[weight_col])).reset_index(drop=True)
     return df
+
+
+def generate_acdd_metadata(ds: xr.Dataset | xr.DataArray) -> dict[str, Any]:
+    """Extract metadata according to the Attribute Convention for Data Discovery (ACDD) standard.
+    The Dataset/DataArray must have time, lat, and lon dimensions"""
+
+    # Verify required dimensions are present
+    required_dims = ["time", "lat", "lon"]
+    for dim in required_dims:
+        if dim not in ds.dims:
+            raise ValueError(f"Dimension '{dim}' not present in the dataset.")
+
+    # Extract dynamic attributes
+    TIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+    timenow_str = pd.Timestamp.utcnow().strftime(TIME_FORMAT)
+
+    times = ds.get_index("time")
+    lats = ds.get_index("lat")
+    lons = ds.get_index("lon")
+
+    timestart_str = times[0].strftime(TIME_FORMAT)
+    timeend_str = times[-1].strftime(TIME_FORMAT)
+
+    latmin = float(lats[0])
+    latmax = float(lats[-1])
+    lonmin = float(lons[0])
+    lonmax = float(lons[-1])
+
+    # Create dict of attributes
+    attrs = {}
+    attrs["time_coverage_start"] = timestart_str
+    attrs["time_coverage_end"] = timeend_str
+    attrs["geospatial_lat_min"] = latmin
+    attrs["geospatial_lat_max"] = latmax
+    attrs["geospatial_lon_min"] = lonmin
+    attrs["geospatial_lon_max"] = lonmax
+    attrs["date_created"] = timenow_str
+
+    return attrs

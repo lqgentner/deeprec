@@ -1,7 +1,7 @@
-# DeepRec Attributes YAML for "era" configuration
+# DeepRec Attributes YAML for "wghm-era" configuration
 
 # Location of input Zarr store
-in_store: models/predictions/ensemble-mixed/ensemble-mixed_era_best-mae.zarr
+in_store: models/predictions/ensemble-mixed/ensemble-mixed_wghm-era_best-mae.zarr
 # Directory of output netCDF file
 out_dir: models/final-products
 
@@ -58,8 +58,8 @@ data_variables:
 
 # Dataset attributes
 dataset:
-  title: DeepRec_CSR_ERA5x14+HI_ensemble-mixture
-  summary: Reconstructed TWS anomalies using CSR GRACE/GRACE-FO mascon solutions as target
+  title: DeepRec_CSR_WGHM+ERA5x14+HI_ensemble-mixture
+  summary: Reconstructed TWS anomalies, ensemble mixture
   keywords: GRACE, gravity, terrestrial water storage anomaly
   Conventions: ACDD-1.3
   product_version: v0.1
@@ -76,6 +76,7 @@ dataset:
   geospatial_lon_resolution: 0.5 degree
   model_target: CSR GRACE/GRACE-FO RL06.3 mascon solutions with all corrections
   model_input: >-
+    WaterGAP v2.2e 20CRv3-ERA5 TWS,
     ERA5 single levels monthly means (d2m, e, lai_hv, lai_lv, pev, sp, sro, ssro, swvl1, swvl2, swvl3, swvl4, t2m, tp),
     ISIMIP land use (irrigated cropland, rainfed cropland, pastures, urban areas),
     ISIMIP lake area fraction,
@@ -91,7 +92,7 @@ encoding:
   general:
     dtype: float32
     zlib: true
-    complevel: 6
+    complevel: 9
   time:
     dtype: float32
     units: hours since 1901-01-01T00:00:00Z

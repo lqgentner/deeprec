@@ -66,7 +66,7 @@ def main():
     da_scale = ds_scale.to_dataarray("member_id", name="laplace_scale")
 
     # Subtract GRACE baseline from location param
-    ds_loc = calculate_grace_anomaly(ds_loc)
+    da_loc = calculate_grace_anomaly(da_loc)
 
     # Recombine into one dataset
     ds = xr.merge([da_loc, da_scale])

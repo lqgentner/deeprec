@@ -1,9 +1,10 @@
-# DeepRec: Reconstructing Pre-GRACE Terrestrial Water Storage Anomalies Using Deep Learning
+# DeepRec: Global Terrestrial Water Storage Reconstruction Since 1941 Using Spatiotemporal-Aware Deep Learning Model
+
 <p align="center">
-    <img src="docs/figures/cover/steelblue_coastlines_southam_blue.png" alt="Globe of TWS reconstruction" title="Model architecture" width="350"/>
+    <img src="figures/cover/cover_southamerica.png" alt="Globe of TWS reconstruction" title="Model architecture" width="300"/>
 <p align="center">
 
-This repository contains the code base accompanying the master's thesis "Reconstructing Pre-GRACE Terrestrial Water Storage Anomalies Using Deep Learning" (Luis Gentner, 2024). The data processing, model training and evaluation is implemented in Python and heavily depends on the packages [xarray](https://docs.xarray.dev/en/stable/), [PyTorch](https://pytorch.org/docs/stable/index.html), and [PyTorch Lightning](https://lightning.ai/docs/pytorch/stable/).
+This repository contains the code base used to create the results presented in "DeepRec: Global Terrestrial Water Storage Reconstruction Since 1941 Using Spatiotemporal-Aware Deep Learning Model". The data processing, model training and evaluation is implemented in Python and heavily depends on the packages [xarray](https://docs.xarray.dev/en/stable/), [PyTorch](https://pytorch.org/docs/stable/index.html), and [PyTorch Lightning](https://lightning.ai/docs/pytorch/stable/).
 
 ## Project structure
 
@@ -19,6 +20,7 @@ This repository contains the code base accompanying the master's thesis "Reconst
     │   ├── preprocessing               <- Functions for data preprocessing
     │   ├── accessors.py                <- Custom xarray and pandas "dr" accessors (e.g., use "DataArray.dr.select_basins()")
     │   └── ...
+    ├── figures                         <- Matplotlib-generated figures for the paper and supporting information
     ├── jobs                            <- Slurm scripts to train models on the ETHZ Cluster
     ├── models                          <- Model predictions and final products (content excluded from this repository)
     ├── notebooks                       <- Notebooks used for evaluations

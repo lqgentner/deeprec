@@ -59,6 +59,10 @@ cloudpickle==3.1.1
     # via
     #   dask
     #   distributed
+colorama==0.4.6
+    # via
+    #   click
+    #   tqdm
 contourpy==1.3.2
     # via
     #   bokeh
@@ -117,6 +121,8 @@ idna==3.10
     # via
     #   requests
     #   yarl
+importlib-metadata==8.7.0
+    # via dask
 importlib-resources==6.5.2
     # via typeshed-client
 isimip-client==1.0.1
@@ -373,7 +379,6 @@ setproctitle==1.3.5
 setuptools==78.1.0
     # via
     #   lightning-utilities
-    #   torch
     #   wandb
 shapely==2.1.0
     # via
@@ -479,3 +484,5 @@ zarr==2.18.7
     #   xarray
 zict==3.0.0
     # via distributed
+zipp==3.21.0
+    # via importlib-metadata

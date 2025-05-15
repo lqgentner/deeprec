@@ -8,47 +8,47 @@ description = "Reconstructing Pre-GRACE Terrestrial Water Storage Anomalies Usin
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "cartopy",
-    "cf-xarray",
-    "dask",
-    "geopandas",
-    "isimip-client",
-    "lightning",
-    "matplotlib",
-    "numpy",
-    "omegaconf",
-    "pandas",
-    "pyjanitor",
+    "cartopy>=0.24.1",
+    "cf-xarray>=0.10.5",
+    "dask>=2025.3.0",
+    "geopandas>=1.0.1",
+    "isimip-client>=1.0.1",
+    "lightning>=2.5.1",
+    "matplotlib>=3.10.1",
+    "numpy>=2.2.4",
+    "omegaconf>=2.3.0",
+    "openpyxl>=3.1.5",
+    "pandas>=2.2.3",
+    "pyjanitor>=0.31.0",
     "jsonargparse[signatures]>=4.34",
-    "regionmask",
-    "requests",
-    "rich",
-    "rioxarray",
-    "scikit-learn",
-    "statsmodels",
-    "shapely",
-    "tabulate",
-    "torch",
-    "torchinfo",
-    "tqdm",
-    "wandb",
-    "xarray[complete]",
-    "xskillscore",
+    "regionmask>=0.13.0",
+    "requests>=2.32.3",
+    "rich>=14.0.0",
+    "rioxarray>=0.18.2",
+    "scikit-learn>=1.6.1",
+    "statsmodels>=0.14.4",
+    "shapely>=2.1.0",
+    "tabulate>=0.9.0",
+    "torch>=2.6.0",
+    "torchinfo>=1.8.0",
+    "tqdm>=4.67.1",
+    "wandb>=0.19.9",
+    "xarray[complete]>=2025.3.1",
+    "xskillscore>=0.0.26",
     "zarr>=2,<3",
-    "openpyxl",
 ]
 
 [project.optional-dependencies]
 download = [
-    "podaac-data-subscriber",
-    "cdsapi",
-    "isimip-client",
+    "podaac-data-subscriber>=1.15.2",
+    "cdsapi>=0.7.5",
+    "isimip-client>=1.0.1",
 ]
 plot = [
-    "ipykernel",
-    "matplotlib-inline",
-    "seaborn",
-    "cmcrameri",
+    "ipykernel>=6.29.5",
+    "matplotlib-inline>=0.1.7",
+    "seaborn>=0.13.2",
+    "cmcrameri>=1.9",
 ]
 complete = ["deeprec[download, plot]"]
 
@@ -58,7 +58,6 @@ packages = ["deeprec"]
 [tool.uv.sources]
 deeprec = { workspace = true }
 
-[dependency-groups]
-dev = [
-    "deeprec",
-]
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"

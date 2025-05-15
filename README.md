@@ -1,7 +1,7 @@
 # DeepRec: Global Terrestrial Water Storage Reconstruction Since 1941 Using Spatiotemporal-Aware Deep Learning Model
 
 <p align="center">
-    <img src="figures/cover/cover_southamerica.png" alt="Globe of TWS reconstruction" title="Model architecture" width="300"/>
+    <img src="figures/cover/cover_southamerica.png" alt="Globe showing reconstructed TWS anomaly of a single month" width="300"/>
 <p align="center">
 
 This repository contains the code base used to create the results presented in "DeepRec: Global Terrestrial Water Storage Reconstruction Since 1941 Using Spatiotemporal-Aware Deep Learning Model". The data processing, model training and evaluation is implemented in Python and heavily depends on the packages [xarray](https://docs.xarray.dev/en/stable/), [PyTorch](https://pytorch.org/docs/stable/index.html), and [PyTorch Lightning](https://lightning.ai/docs/pytorch/stable/).
@@ -35,20 +35,44 @@ The project structure is based on the [cookiecutter data science project templat
 Clone this repository to a directory of your choice:
 
     git clone https://github.com/lqgentner/deeprec.git
+    cd deeprec
 
 Make sure that Python 3.11 or later is installed on your system:
 
+    # Windows
     python --version
 
-Create a new virtual environment:
+    # Linux and MacOS
+    python3 --version
 
-    cd deeprec
+### Recreating the environment with uv
+
+If you use the [uv](https://docs.astral.sh/uv/) package manager, you can create the virtual environment and install all packages with one command. It installs `deeprec` as editable package. This also installs all dependencies for the package itself and for running all scripts (preprocessing and model training).
+
+    uv sync
+
+If you want to download the data sets required for model training or want to run the notebooks used for creating the plots, install the optional dependencies with:
+
+    # For downloading the data sets
+    uv sync --extra download
+
+    # For running the notebooks
+    uv sync --extra plot
+
+    # For installing all optional dependencies
+    uv sync --all-extras
+
+### Recreating the environment with pip and venv
+
+If you do not want to use uv, you can also use the tools shipped with Python. First, create a new virtual environment:
+
     python -m venv .venv
 
-Activate the virtual environment. On Windows, run one of the following scripts:
+Second, activate the virtual environment. On Windows, run one of the following scripts:
 
     # In cmd.exe
     .venv\Scripts\activate.bat
+
     # In PowerShell
     .venv\Scripts\Activate.ps1
 
@@ -56,11 +80,11 @@ On Linux or macOS, use the source command:
 
     source .venv/bin/activate
 
-Now you can install `deeprec` as editable package. This also installs all dependencies for the package itself and for running all scripts (preprocessing and model training).
+Last, install `deeprec` as editable package. This also installs all dependencies for the package itself and for running all scripts (preprocessing and model training).
 
     pip install -e .
 
-If you want to download the input and model data sets required for model training or want to run the notebooks used for creating the plots, install the optional dependenices with:
+If you want to download the data sets required for model training or want to run the notebooks used for creating the plots, install the optional dependenices with:
 
     # For downloading the data sets
     pip install -e ".[download]"

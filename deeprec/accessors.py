@@ -10,7 +10,7 @@ import xarray as xr
 from cartopy.mpl.geoaxes import GeoAxes
 from cartopy.mpl.geocollection import GeoQuadMesh
 from xarray.core.formatting import dim_summary
-from xarray.core.weighted import DataArrayWeighted, DatasetWeighted
+from xarray.computation.weighted import DataArrayWeighted, DatasetWeighted
 from xarray.plot.facetgrid import FacetGrid
 
 from . import regions

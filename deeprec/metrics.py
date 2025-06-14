@@ -1,14 +1,12 @@
 """Containes evaluation metrics to apply on Datasets and Data Arrays"""
 
-from typing import Callable
+from typing import Literal
 
 import numpy as np
-import xarray as xr
 from numpy import ndarray
 from torch import Tensor
+import xarray as xr
 from xskillscore import (
-    effective_sample_size,
-    linslope,
     mae,
     mape,
     me,
@@ -27,75 +25,13 @@ from xskillscore import (
 
 from .utils import XrObj
 
-__all__ = [
-    "pred_metric",
-    "kge",
-    "nse",
-    "effective_sample_size",
-    "linslope",
-    "mae",
-    "mape",
-    "me",
-    "median_absolute_error",
-    "mse",
-    "pearson_r",
-    "pearson_r_eff_p_value",
-    "pearson_r_p_value",
-    "r2",
-    "rmse",
-    "smape",
-    "spearman_r",
-    "spearman_r_eff_p_value",
-    "spearman_r_p_value",
-]
-
-
-def pred_metric(
-    metric: str | Callable[[xr.DataArray, xr.DataArray], xr.DataArray],
-    y_true: xr.DataArray,
-    y_pred: xr.DataArray | ndarray,
-    skipna: bool = False,
-) -> float:
-    """Calculate a metric on a ML prediction which has stacked time, lat, and lon dimensions."""
-
-    # Get corresponding metric if input is string
-    if isinstance(metric, str):
-        try:
-            metric = globals()[metric]
-        except KeyError as exc:
-            raise ValueError(f"Function `{metric}` not implemented") from exc
-
-    # Ensure prediction is xarray DataArray
-    if isinstance(y_pred, xr.DataArray):
-        pass
-    elif isinstance(y_pred, ndarray):
-        y_pred = y_true.copy(data=y_pred)
-    elif isinstance(y_pred, Tensor):
-        y_pred = y_true.copy(data=y_pred.cpu().numpy())
-    else:
-        raise TypeError(f"`y_pred` type {type(y_pred).__name__} not supported")
-
-    # Unstack ()
-    def preprocess(da):
-        return (
-            da
-            # Unstack: ("sample",) -> ("time", "lat", "lon")
-            .unstack()
-            # Stack: ("time", "lat", "lon") -> ("time", "space")
-            .stack(space=["lat", "lon"])
-        )
-
-    out = metric(preprocess(y_true), preprocess(y_pred), dim="time", skipna=skipna)
-
-    return float(out.mean().values)
-
 
 def kge(
     o: XrObj,
     m: xr.DataArray,
-    dim: str | list[str] = None,
+    dim: str | list[str] | None = None,
     skipna: bool = False,
-    keep_attrs: bool = False,
+    keep_attrs: bool | Literal["default"] = "default",
 ) -> XrObj:
     """
     Original Kling-Gupta Efficiency (KGE) as per
@@ -112,11 +48,11 @@ def kge(
         be reduced as a result. Defaults to None reducing all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
-    keep_attrs : bool
-        If True, the attributes (attrs) will be copied
-        from the first input to the new one.
-        If False (default), the new object will
-        be returned without attributes.
+    keep_attrs : {"default", True, False}
+        Whether to keep attributes on xarray Datasets/dataarrays after operations. Can be
+        - True : to always keep attrs
+        - False : to always discard attrs
+        - default : to use original logic that attrs should only be kept in unambiguous circumstances
 
     Returns
     -------
@@ -126,9 +62,6 @@ def kge(
     """
     # GET the PCC
     r = pearson_r(o, m, dim=dim, skipna=skipna, keep_attrs=keep_attrs)
-
-    if keep_attrs is False:
-        keep_attrs = "default"
 
     with xr.set_options(keep_attrs=keep_attrs):
         # Calculate error in spread of flow alpha
@@ -146,9 +79,9 @@ def kge(
 def kgeprime(
     o: XrObj,
     m: xr.DataArray,
-    dim: str | list[str] = None,
+    dim: str | list[str] | None = None,
     skipna: bool = False,
-    keep_attrs: bool = False,
+    keep_attrs: bool | Literal["default"] = "default",
 ) -> XrObj:
     """
     Modified Kling-Gupta Efficiency (KGE') as per
@@ -165,11 +98,13 @@ def kgeprime(
         be reduced as a result. Defaults to None reducing all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
-    keep_attrs : bool
-        If True, the attributes (attrs) will be copied
-        from the first input to the new one.
-        If False (default), the new object will
-        be returned without attributes.
+    keep_attrs : {"default", True, False}
+        Whether to keep attributes on xarray Datasets/dataarrays after operations. Can be
+        - True : to always keep attrs
+        - False : to always discard attrs
+        - default : to use original logic that attrs should only be kept in unambiguous circumstances
+
+
 
     Returns
     -------
@@ -179,9 +114,6 @@ def kgeprime(
     """
     # GET the PCC
     r = pearson_r(o, m, dim=dim, skipna=skipna, keep_attrs=keep_attrs)
-
-    if keep_attrs is False:
-        keep_attrs = "default"
 
     with xr.set_options(keep_attrs=keep_attrs):
         m_mean = m.mean(dim)
@@ -202,9 +134,9 @@ def kgeprime(
 def nse(
     o: XrObj,
     m: xr.DataArray,
-    dim: str | list[str] = "time",
+    dim: str | list[str] | None = "time",
     skipna: bool = False,
-    keep_attrs: bool = False,
+    keep_attrs: bool | Literal["default"] = "default",
 ) -> XrObj:
     """
     Nash-Sutcliffe Efficiency (NSE) as per
@@ -222,11 +154,11 @@ def nse(
         be reduced as a result. Defaults to None reducing all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
-    keep_attrs : bool
-        If True, the attributes (attrs) will be copied
-        from the first input to the new one.
-        If False (default), the new object will
-        be returned without attributes.
+    keep_attrs : {"default", True, False}
+        Whether to keep attributes on xarray Datasets/dataarrays after operations. Can be
+        - True : to always keep attrs
+        - False : to always discard attrs
+        - default : to use original logic that attrs should only be kept in unambiguous circumstances
 
     Returns
     -------
@@ -249,7 +181,7 @@ def nsec(
     o: XrObj,
     m: xr.DataArray,
     skipna: bool = False,
-    keep_attrs: bool = False,
+    keep_attrs: bool | Literal["default"] = "default",
 ) -> XrObj:
     """
     Cyclostationary Nash-Sutcliffe Efficiency (NSE). Values higher than 0 indicate that
@@ -267,11 +199,11 @@ def nsec(
         be reduced as a result. Defaults to None reducing all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
-    keep_attrs : bool
-        If True, the attributes (attrs) will be copied
-        from the first input to the new one.
-        If False (default), the new object will
-        be returned without attributes.
+    keep_attrs : {"default", True, False}
+        Whether to keep attributes on xarray Datasets/dataarrays after operations. Can be
+        - True : to always keep attrs
+        - False : to always discard attrs
+        - default : to use original logic that attrs should only be kept in unambiguous circumstances
 
     Returns
     -------
@@ -279,9 +211,6 @@ def nsec(
         Cyclostationary Nash-Sutcliffe Efficiency.
 
     """
-
-    if keep_attrs is False:
-        keep_attrs = "default"
 
     # Calculate the monthly climatology
     o_clim = o.groupby("time.month").mean()
@@ -294,3 +223,68 @@ def nsec(
         mse_ = mse(o, m, dim="time", skipna=skipna)
         nsec_ = 1 - mse_ / o_var
     return nsec_
+
+
+ALLOWED_METRICS = {
+    # xskillscore metrics
+    "mae": mae,
+    "mape": mape,
+    "me": me,
+    "median_absolute_error": median_absolute_error,
+    "mse": mse,
+    "pearson_r": pearson_r,
+    "pearson_r_eff_p_value": pearson_r_eff_p_value,
+    "pearson_r_p_value": pearson_r_p_value,
+    "r2": r2,
+    "rmse": rmse,
+    "smape": smape,
+    "spearman_r": spearman_r,
+    "spearman_r_eff_p_value": spearman_r_eff_p_value,
+    "spearman_r_p_value": spearman_r_p_value,
+    # My custom metrics
+    "kge": kge,
+    "kgeprime": kgeprime,
+    "nse": nse,
+    "nsec": nsec,
+}
+
+
+def pred_metric(
+    metric: str,
+    y_true: xr.DataArray,
+    y_pred: xr.DataArray | ndarray,
+    skipna: bool = False,
+) -> float:
+    """Calculate a metric on a ML prediction which has stacked time, lat, and lon dimensions."""
+
+    # Get corresponding metric
+    if metric not in ALLOWED_METRICS:
+        available_metrics = ", ".join(sorted(ALLOWED_METRICS.keys()))
+        raise ValueError(
+            f"Metric '{metric}' not allowed. Available metrics: {available_metrics}"
+        )
+    metric_func = ALLOWED_METRICS[metric]
+
+    # Ensure prediction is xarray DataArray
+    if isinstance(y_pred, xr.DataArray):
+        pass
+    elif isinstance(y_pred, ndarray):
+        y_pred = y_true.copy(data=y_pred)
+    elif isinstance(y_pred, Tensor):
+        y_pred = y_true.copy(data=y_pred.cpu().numpy())
+    else:
+        raise TypeError(f"`y_pred` type {type(y_pred).__name__} not supported")
+
+    # Unstack ()
+    def preprocess(da):
+        return (
+            da
+            # Unstack: ("sample",) -> ("time", "lat", "lon")
+            .unstack()
+            # Stack: ("time", "lat", "lon") -> ("time", "space")
+            .stack(space=["lat", "lon"])
+        )
+
+    out = metric_func(preprocess(y_true), preprocess(y_pred), dim="time", skipna=skipna)
+
+    return float(out.mean().values)

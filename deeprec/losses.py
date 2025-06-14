@@ -35,20 +35,6 @@ def rmse(preds: Tensor, target: Tensor, weight: Tensor | None = None) -> Tensor:
     return loss
 
 
-def nse(
-    preds: Tensor, target: Tensor, std: Tensor, weight: Tensor | None = None
-) -> Tensor:
-    """Modified Nash-Sutcliffe model efficiency score.
-    Contrary to the classical definition of NSE, less is better:
-    NSE' = 1 - NSE"""
-    EPS = 0.1
-    squared_error = mse_loss(preds, target, reduction="none")
-    scaled_loss = squared_error / (std + EPS) ** 2
-    if weight is not None:
-        scaled_loss = scaled_loss * weight / weight.mean()
-    return scaled_loss.mean()
-
-
 def huber(preds: Tensor, target: Tensor, weight: Tensor | None = None) -> Tensor:
     """Huber loss"""
     if weight is not None:

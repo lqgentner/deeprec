@@ -15,7 +15,7 @@ This repository contains the code base used to create the results presented in "
     │   └── style_paper.mplstyle        <- Matplotlib style sheet for plots
     ├── data                            <- Raw and processed inputs (content excluded from this repository)
     ├── deeprec                         <- Source code
-    │   ├── data                        <- PyTorch Lightning Datasets and DataModules
+    │   ├── data                        <- PyTorch Lightning dataset and datamodule implementations
     │   ├── models                      <- PyTorch model implementations
     │   ├── preprocessing               <- Functions for data preprocessing
     │   ├── accessors.py                <- Custom xarray and pandas "dr" accessors (e.g., use "DataArray.dr.select_basins()")
@@ -25,10 +25,12 @@ This repository contains the code base used to create the results presented in "
     ├── models                          <- Model predictions and final products (content excluded from this repository)
     ├── notebooks                       <- Notebooks used for evaluations
     ├── scripts                         <- Scripts for data processing and model training / predicting
-    ├── requirements.txt                <- The requirements file for reproducing the analysis environment
-    └── pyproject.toml                  <- makes `deeprec` pip installable ("pip install -e .")
+    ├── LICENSE                         <- Open-source license
+    ├── pyproject.toml                  <- Project configuration file, makes `deeprec` pip installable ("pip install -e .")
+    ├── README.md                       <- This file
+    └── uv.lock                         <- Lockfile to reproduce the installation with uv (cross-plattform)
 
-The project structure is based on the [cookiecutter data science project template](https://drivendata.github.io/cookiecutter-data-science/).
+The project structure is based on the [Cookiecutter Data Science](https://cookiecutter-data-science.drivendata.org/) project template.
 
 ## Replicating the analysis
 

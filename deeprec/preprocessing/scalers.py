@@ -1,19 +1,26 @@
 """Implementation of scalers for Xarray, inspired by Scikit-Learn"""
 
+from abc import ABC, abstractmethod
+
 import numpy as np
 import xarray as xr
 
 
-class AbstractScaler:
+class AbstractScaler(ABC):
     def __init__(self) -> None:
-        self.center = None
-        self.scale = None
+        self.center: xr.Dataset | None = None
+        self.scale: xr.Dataset | None = None
         # Save common dtype if all dtypes in dataset are identical
-        self._common_dtype = None
+        self._common_dtype: np.dtype | None = None
+
+    @abstractmethod
+    def fit(self, ds: xr.Dataset) -> None:
+        """Fit the scaler on a Xarray Dataset."""
+        pass
 
     def transform(self, ds: xr.Dataset) -> xr.Dataset:
         """Fit the scaler on a Xarray Dataset"""
-        if self.center is None:
+        if self.center is None or self.scale is None:
             raise AttributeError(
                 "This scaler instance is not fitted yet. Call 'fit' with appropriate arguments before using 'transform'."
             )

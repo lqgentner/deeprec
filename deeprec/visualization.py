@@ -1,21 +1,22 @@
 from typing import Hashable
 
 import cartopy.crs as ccrs
+from cartopy.mpl.geoaxes import GeoAxes
+from cartopy.mpl.geocollection import GeoQuadMesh
+from matplotlib.patches import Rectangle
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from pandas import Timestamp
 import regionmask
 import xarray as xr
-from cartopy.mpl.geoaxes import GeoAxes
-from cartopy.mpl.geocollection import GeoQuadMesh
-from pandas import Timestamp
 from xarray.plot.facetgrid import FacetGrid
 
 from .regions import basins
 from .utils import verify_dim_ispresent
 
 
-def plot_grace_gap(ax: plt.Axes) -> plt.Axes:
+def plot_grace_gap(ax: plt.Axes) -> Rectangle:
     """Add the area of the GRACE/GRACE-FO gap to the axis of a plot.
     time must be on the x-axis.
     """
@@ -124,7 +125,7 @@ def plot_missing_timesteps(
             ax.axvspan(start, end, **plot_kwargs)
 
 
-def _projplot_facet(
+def projplot_facet(
     da: xr.DataArray,
     crs: ccrs.CRS = ccrs.PlateCarree(),
     projection: ccrs.CRS = ccrs.EqualEarth(),
@@ -162,7 +163,7 @@ def _projplot_facet(
     return p
 
 
-def _projplot_single(
+def projplot_single(
     da: xr.DataArray,
     crs: ccrs.CRS = ccrs.PlateCarree(),
     projection: ccrs.CRS = ccrs.EqualEarth(),

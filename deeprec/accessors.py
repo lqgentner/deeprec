@@ -1,21 +1,20 @@
 from collections.abc import Iterable
-from typing import Any, Hashable, Literal
+from typing import Any, Generic, Hashable, Literal
 
 import cartopy.crs as ccrs
+from cartopy.mpl.geoaxes import GeoAxes
+from cartopy.mpl.geocollection import GeoQuadMesh
 import geopandas as gpd
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import xarray as xr
-from cartopy.mpl.geoaxes import GeoAxes
-from cartopy.mpl.geocollection import GeoQuadMesh
-from xarray.core.formatting import dim_summary
 from xarray.computation.weighted import DataArrayWeighted, DatasetWeighted
+from xarray.core.formatting import dim_summary
 from xarray.plot.facetgrid import FacetGrid
 
 from . import regions
 from .utils import XrObj
-from .visualization import _projplot_facet, _projplot_single, plot_basinwise_map
+from .visualization import plot_basinwise_map, projplot_facet, projplot_single
 
 
 # (Geo-)Pandas accessor
@@ -41,8 +40,8 @@ class PandasAccessor:
         gridlines: bool = False,
         coastlines_kwargs: dict[str, Any] | None = None,
         gridlines_kwargs: dict[str, Any] | None = None,
-        ax: plt.Axes | GeoAxes = None,
-        **kwargs,
+        ax: GeoAxes | None = None,
+        **kwargs: dict[str, Any],
     ) -> GeoAxes:
         """
         Create a projected plot of shapley geometries.
@@ -85,7 +84,7 @@ class PandasAccessor:
         """
 
         if ax is None:
-            ax = plt.axes(projection=projection)
+            ax = GeoAxes(projection=projection)
 
         ax.add_geometries(self._obj.geometry, crs=crs, **kwargs)
 
@@ -101,11 +100,11 @@ class PandasAccessor:
 
 
 # Xarray accessor class for methods share between the DataArray and Dataset accessors
-class XrBaseAccessor:
+class XrBaseAccessor(Generic[XrObj]):
     """The DeepRec Xarray accessor base class"""
 
     def __init__(self, xarray_obj: XrObj):
-        self._obj = xarray_obj
+        self._obj: XrObj = xarray_obj
 
     def crop_notnull(self) -> XrObj:
         """
@@ -365,7 +364,7 @@ class XrDataArrayAccessor(XrBaseAccessor):
             if ax:
                 raise TypeError("Can't create a FacetGrid on an existing Axis.")
 
-            p = _projplot_facet(
+            p = projplot_facet(
                 self._obj,
                 crs=crs,
                 projection=projection,
@@ -380,7 +379,7 @@ class XrDataArrayAccessor(XrBaseAccessor):
                 **kwargs,
             )
         else:
-            p = _projplot_single(
+            p = projplot_single(
                 self._obj,
                 crs=crs,
                 projection=projection,

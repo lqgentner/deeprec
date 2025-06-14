@@ -10,8 +10,9 @@ import logging
 from pathlib import Path
 
 import geopandas as gpd
-import janitor  # noqa
+import janitor  # noqa: F401
 import numpy as np
+
 from deeprec.utils import ROOT_DIR
 
 

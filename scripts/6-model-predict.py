@@ -6,17 +6,17 @@ Help on the usage:
     python scripts/6-model-predict.py --help
 """
 
-from pydoc import locate
 import argparse
+from pydoc import locate
 
 import lightning as L
 import torch
-from lightning.pytorch.callbacks import RichProgressBar
-import xarray as xr
-
 import wandb
-from deeprec.utils import ROOT_DIR, wandb_checkpoint_download
+import xarray as xr
+from lightning.pytorch.callbacks import RichProgressBar
+
 from deeprec.data import DeepRecDataModule
+from deeprec.utils import ROOT_DIR, wandb_checkpoint_download
 
 
 def main() -> None:
@@ -64,7 +64,12 @@ def predict(
 
     # Model creation
     model_class = locate(config["model"]["class_path"])
-    model = model_class.load_from_checkpoint(ckpt_file, **config["model"])
+    if isinstance(model_class, L.LightningModule):
+        model = model_class.load_from_checkpoint(ckpt_file, **config["model"])
+    else:
+        raise TypeError(
+            f"Provided class_path '{model_class}' is not a LightningModule."
+        )
 
     # Data creation
     dm = DeepRecDataModule(**config["data"])
@@ -86,12 +91,14 @@ def predict(
     pred = trainer.predict(model, datamodule=dm)
     pred_name = f"{wandb_run_id}_{alias}"
     # Safety copy
-    pred = dm.predictions_to_xarray(pred, name=pred_name)
-    if isinstance(pred, xr.DataArray):
-        pred = pred.to_dataset()
+    pred_xr = dm.predictions_to_xarray(pred, name=pred_name)
+    if isinstance(pred_xr, xr.DataArray):
+        pred_ds = pred_xr.to_dataset()
+    else:
+        pred_ds = pred_xr
 
     # Set attributes
-    pred.attrs = {
+    pred_ds.attrs = {
         "model_class": model_class.__name__,
         "scenario": config["scenario"],
         "target": config["data"]["target_var"],
@@ -101,7 +108,7 @@ def predict(
     store_path = ROOT_DIR / zarr_store
     print(f"Writing prediction '{pred_name}' to zarr store '{store_path}...")
     store_path.parent.mkdir(parents=True, exist_ok=True)
-    pred = pred.chunk({"lat": 120, "lon": 120}).to_zarr(store_path, mode="a")
+    pred_ds = pred_ds.chunk({"lat": 120, "lon": 120}).to_zarr(store_path, mode="a")
     print("Completed successfully.")
 
 

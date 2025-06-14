@@ -93,8 +93,10 @@ def main():
 def split_pred_uncertainty(ds: xr.Dataset) -> tuple[xr.Dataset, xr.Dataset]:
     """Split dataset containing predictions and uncertainties into two datasets"""
 
-    mean_names = [name for name in ds.data_vars if name.startswith("pred_")]
-    scale_names = [name for name in ds.data_vars if name.startswith("uncertainty_")]
+    mean_names = [name for name in ds.data_vars if str(name).startswith("pred_")]
+    scale_names = [
+        name for name in ds.data_vars if str(name).startswith("uncertainty_")
+    ]
 
     # Split in prediction and uncertainty datasets
     ds_mean = ds[mean_names]
@@ -114,7 +116,7 @@ def remove_name_prefix(ds: xr.Dataset) -> xr.Dataset:
     """Removes the variable name prefix. Variables must be named
     <prefix>_<wandb_id>_<alias>.
     """
-    renamer = {name: "_".join(name.split("_")[1:]) for name in ds.data_vars}
+    renamer = {name: "_".join(str(name).split("_")[1:]) for name in ds.data_vars}
     return ds.rename_vars(renamer)
 
 

@@ -85,7 +85,7 @@ def main() -> None:
 def process_datasets(config: list[dict]) -> list[xr.Dataset]:
     """Open datasets and apply functions to them and their data variables."""
     ds_list = []
-    with dask.config.set(**{"array.slicing.split_large_chunks": False}):
+    with dask.config.set({"array.slicing.split_large_chunks": False}):
         # Iterate over datasets to load
         for ds_config in tqdm(config):
             # Open dataset

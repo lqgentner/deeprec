@@ -15,7 +15,7 @@ import xarray as xr
 from dask.diagnostics import ProgressBar
 from omegaconf import OmegaConf
 
-from deeprec.utils import month_center_range, generate_acdd_metadata
+from deeprec.utils import generate_acdd_metadata, month_center_range
 
 
 def main():

@@ -11,10 +11,10 @@ from pydoc import locate
 
 import lightning as L
 import torch
+import wandb
 from lightning.pytorch.callbacks import RichProgressBar
 from lightning.pytorch.loggers import WandbLogger
 
-import wandb
 from deeprec.data import DeepRecDataModule
 from deeprec.training import define_wandb_metrics
 from deeprec.utils import ROOT_DIR, wandb_checkpoint_download
@@ -44,6 +44,10 @@ def test(wandb_project: str, wandb_run_id: str, alias: str = "best") -> None:
     wandb_project = wandb_project.split("/")[-1]
     wandb.init(project=wandb_project, id=wandb_run_id, resume="must")
     run = wandb.run
+    if run is None:
+        raise RuntimeError(
+            "wandb.run is None. Failed to initialize W&B run. Check your project and run_id."
+        )
     wandb_logger = WandbLogger()
 
     # Download checkpoint
@@ -56,7 +60,12 @@ def test(wandb_project: str, wandb_run_id: str, alias: str = "best") -> None:
 
     # Model creation
     model_class = locate(config["model"]["class_path"])
-    model = model_class.load_from_checkpoint(ckpt_file, **config["model"])
+    if isinstance(model_class, L.LightningModule):
+        model = model_class.load_from_checkpoint(ckpt_file, **config["model"])
+    else:
+        raise TypeError(
+            f"Provided class_path '{model_class}' is not a LightningModule."
+        )
 
     # Data creation
     dm = DeepRecDataModule(**config["data"])

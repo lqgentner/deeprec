@@ -1,19 +1,18 @@
 """Dataset download routines"""
 
-import io
-import sys
-import zipfile
 from datetime import datetime
-from importlib import reload
+import io
 from math import floor
+from os import PathLike
 from pathlib import Path
-from typing import Any, Literal, TypeVar
+from typing import Any, TypeVar
+import zipfile
 
+from numpy import datetime64
 import pandas as pd
 import requests
 import wandb
 import xarray as xr
-from numpy import datetime64
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 """Absolute base path of project. All paths are defined relative to this path."""
@@ -21,7 +20,7 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 XrObj = TypeVar("XrObj", xr.Dataset, xr.DataArray)
 
 
-def download_file(url: str, path: str, timeout: float = 5.0, **get_kwargs):
+def download_file(url: str, path: str | PathLike, timeout: float = 5.0, **get_kwargs):
     """Downloads a file from a provided URL"""
     filename = url.rsplit("/")[-1]
     # Ensure path is pathlib object
@@ -72,25 +71,11 @@ def conv2d_out_size(
     )
 
 
-def reload_submodule(name: str) -> None:
-    """Reload a submodule from a package"""
-    ls = []
-    # making copy to avoid regeneration of sys.modules
-    for i, j in sys.modules.items():
-        r, v = i, j
-        ls.append((r, v))
-
-    for i in ls:
-        if i[0] == name:
-            reload(i[1])
-            break
-
-
 def wandb_checkpoint_download(
-    artifact_path: str = None,
-    project: str = None,
-    run_id: str = None,
-    alias: Literal["best", "latest"] | int = "best",
+    artifact_path: str | None = None,
+    project: str | None = None,
+    run_id: str | None = None,
+    alias: str | int = "best",
 ) -> Path:
     """Download a model checkpoint from Weights & Biases.
 
@@ -105,7 +90,7 @@ def wandb_checkpoint_download(
         The W&B project name including the entity, e.g. 'my_name/my_project'.
     run_id: str, optional
         The W&B run ID.
-    alias: 'best', 'latest', or int, default: 'best'
+    alias: 'best', 'latest', 'v<int>', or int, default: 'best'
         The artifact alias which specifies which checkpoint version to download.
 
 

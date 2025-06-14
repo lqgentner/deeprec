@@ -3,10 +3,9 @@
 from pathlib import Path
 
 import lightning as L
+from omegaconf import OmegaConf
 import torch
 import torchinfo
-from omegaconf import OmegaConf
-
 import wandb
 
 

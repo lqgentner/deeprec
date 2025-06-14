@@ -4,8 +4,8 @@ from collections.abc import Iterable
 
 import numpy as np
 import pandas as pd
-import xarray as xr
 from statsmodels.tsa.seasonal import MSTL, STL
+import xarray as xr
 
 
 def _stl(series: np.ndarray, **stl_kwargs) -> np.ndarray:

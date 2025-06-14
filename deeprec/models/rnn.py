@@ -1,20 +1,22 @@
-import abc
+from abc import abstractmethod
 from pathlib import Path
 
 import torch
-import torch.nn as nn
 from torch import Tensor
+import torch.nn as nn
 
 from deeprec.models.base import BaseModel, matrix2tensor
 from deeprec.utils import ROOT_DIR, wandb_checkpoint_download
 
 
 class PretrainMixin(nn.Module):
-    @abc.abstractmethod
-    def forward(self, x) -> None:
+    @abstractmethod
+    def forward(self, x):
         pass
 
-    def _load_weights(self, ckpt_path: str, submodule: str | None = None) -> None:
+    def _load_weights(
+        self, ckpt_path: str | Path, submodule: str | None = None
+    ) -> None:
         """Load model weights from a state dict.
 
         Parameters
@@ -34,16 +36,17 @@ class PretrainMixin(nn.Module):
         """
         # Path can be an absolute system path, relative system path,
         # or a Weights & Biases artifact (starts with "wandb://")
-        if ckpt_path.split("/")[0] == "wandb:":
-            # Download W&B artifact
-            artifact_path = "/".join(ckpt_path.split("/")[2:])
-            ckpt_path = wandb_checkpoint_download(artifact_path)
-        elif not Path(ckpt_path).is_absolute():
+        if isinstance(ckpt_path, str):
+            if ckpt_path.split("/")[0] == "wandb:":
+                # Download W&B artifact
+                artifact_path = "/".join(ckpt_path.split("/")[2:])
+                ckpt_path = wandb_checkpoint_download(artifact_path)
+            else:
+                # Not a WandB artifact
+                ckpt_path = Path(ckpt_path)
+        if not Path(ckpt_path).is_absolute():
             # Make relative path absolute
             ckpt_path = ROOT_DIR / ckpt_path
-        else:
-            # Path is absolute
-            ckpt_path = Path(ckpt_path)
 
         print(f"Loading pre-training checkpoint from: {ckpt_path}")
         state_dict = torch.load(ckpt_path)["state_dict"]
@@ -108,11 +111,12 @@ class CropResBlock(nn.Module):
         self.bn2 = nn.BatchNorm2d(out_channels)
         self.relu = nn.ReLU(inplace=True)
 
+        self.crop: nn.ZeroPad2d | None = None
+        self.downsample: nn.Sequential | None = None
+
         if padding != 1:
             # Change window size by cropping to the center
             self.crop = nn.ZeroPad2d(2 * (-1 + padding))
-        else:
-            self.crop = None
 
         if out_channels != in_channels:
             self.downsample = nn.Sequential(
@@ -126,8 +130,6 @@ class CropResBlock(nn.Module):
                 ),
                 nn.BatchNorm2d(out_channels),
             )
-        else:
-            self.downsample = None
 
     def forward(self, x: Tensor):
         identity = x

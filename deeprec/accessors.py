@@ -200,42 +200,6 @@ class XrBaseAccessor(Generic[XrObj]):
 
         return regions.select_countries(self._obj, names, return_region, drop)
 
-    def select_continents(
-        self,
-        names: str | list[str] | None = None,
-        return_region: bool = True,
-        drop: bool = False,
-    ) -> XrObj:
-        """
-        Select a Dataset / DataArray by continents.
-
-        Parameters
-        ----------
-
-        names: string or list of strings, optional
-            The continents names to select.
-            If None, all continents are selected.
-
-        return_region: bool, default: True
-            If True, the returned dataframe has a `region` dimension.
-
-            With a region dimension calculating weighted basin averages
-            is more convenient, without one plotting is easier.
-
-        drop: bool, default: False
-            If True, coordinate labels outside of the continent
-            are dropped from the result.
-
-
-        Returns
-        -------
-
-        Dataset or DataArray
-
-        """
-
-        return regions.select_continents(self._obj, names, return_region, drop)
-
     def insert_grace_gap_nans(self) -> XrObj:
         """
         Inserts a timestamp filled with NaNs during the GRACE/GRACE-FO gap (on 2018-01-01).

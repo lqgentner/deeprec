@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Process the basins, countries and continents shapefiles.
+Process the basins and countries shapefiles.
 Usage:
     python scripts/2-clean-shapefiles.py
 """

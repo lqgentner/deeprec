@@ -56,41 +56,6 @@ def basins(
     return gdf
 
 
-def continents(names: str | list[str] | None = None) -> gpd.GeoDataFrame:
-    """
-    Returns a geopandas dataframe containing the selected continents.
-
-    Parameters
-    ---------
-
-    names: string or list of strings, optional
-        The names of continents to return.
-        Leave empty to return all.
-
-    Returns
-    -------
-
-    GeoDataFrame
-        A dataframe with basin information and geometry
-
-    """
-
-    file = ROOT_DIR / "data/processed/shapefiles/continents/World_Continents.shp"
-
-    gdf = gpd.read_file(file, engine="pyogrio")
-
-    # Put single name string into list
-    if isinstance(names, str):
-        names = [names]
-
-    if names:
-        gdf = gdf.loc[gdf.continent.isin(names)]
-
-    # Return the full DataFrame if `names` is not provided
-
-    return gdf
-
-
 def countries(names: str | list[str] | None = None) -> gpd.GeoDataFrame:
     """
     Returns a geopandas dataframe containing the countries.
@@ -242,50 +207,6 @@ def select_countries(
         names="admin",
         abbrevs="adm0_a3",
         name="country",
-    )
-
-    return _select_region(obj, regions, return_region=return_region, drop=drop)
-
-
-def select_continents(
-    obj: XrObj,
-    names: str | list[str] | None = None,
-    return_region: bool = True,
-    drop: bool = False,
-) -> XrObj:
-    """
-    Select a Dataset / DataArray by continents.
-
-    Parameters
-    ----------
-
-    names: string or list of strings, optional
-        The continents names to select.
-        If None, all continents are selected.
-
-    return_region: bool, default: True
-        If True, the returned dataframe has a `region` dimension.
-
-        With a region dimension calculating weighted basin averages
-        is more convenient, without one plotting is easier.
-
-    drop: bool, default: False
-        If True, coordinate labels outside of the continent
-        are dropped from the result.
-
-
-    Returns
-    -------
-
-    Dataset or DataArray
-
-    """
-
-    regions = regionmask.from_geopandas(
-        continents(names),
-        names="continent",
-        abbrevs="_from_name",
-        name="continent",
     )
 
     return _select_region(obj, regions, return_region=return_region, drop=drop)

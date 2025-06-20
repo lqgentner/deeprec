@@ -23,6 +23,7 @@ import argparse
 from pathlib import Path
 import re
 from urllib.parse import unquote
+from zipfile import ZipFile
 
 import cdsapi
 import earthaccess
@@ -319,7 +320,10 @@ class DatasetDownloader:
             # Humphrey, 2019
             url = "https://figshare.com/ndownloader/files/17990285"
             download_dir = self.dl_path / "reconstructions/humphrey"
-            self.download_file(url, download_dir)
+            file_path = self.download_file(url, download_dir)
+            # Extract ZIP
+            with ZipFile(file_path) as zip:
+                zip.extractall(path=file_path)
 
             # Yin, 2023
             url = "https://zenodo.org/records/10040927/files/CSR-based%20GTWS-MLrec%20TWS.nc"

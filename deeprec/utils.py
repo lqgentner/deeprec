@@ -1,16 +1,12 @@
 """Dataset download routines"""
 
 from datetime import datetime
-import io
 from math import floor
-from os import PathLike
 from pathlib import Path
 from typing import Any, TypeVar
-import zipfile
 
 from numpy import datetime64
 import pandas as pd
-import requests
 import wandb
 import xarray as xr
 
@@ -18,25 +14,6 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 """Absolute base path of project. All paths are defined relative to this path."""
 
 XrObj = TypeVar("XrObj", xr.Dataset, xr.DataArray)
-
-
-def download_file(url: str, path: str | PathLike, timeout: float = 5.0, **get_kwargs):
-    """Downloads a file from a provided URL"""
-    filename = url.rsplit("/")[-1]
-    # Ensure path is pathlib object
-    path = Path(path)
-    path.mkdir(exist_ok=True, parents=True)
-    filepath = Path(path) / filename
-    response = requests.get(url, timeout=timeout, **get_kwargs)
-    with open(filepath, mode="wb") as file:
-        file.write(response.content)
-
-
-def download_zip(url: str, path: str, timeout: float = 5.0, **get_kwargs):
-    """Downloads and unzips an archive from a provided URL"""
-    request = requests.get(url=url, timeout=timeout, **get_kwargs)
-    zip_file = zipfile.ZipFile(io.BytesIO(request.content))
-    zip_file.extractall(path=path)
 
 
 def month_center_range(

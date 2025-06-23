@@ -10,10 +10,11 @@ import argparse
 from pydoc import locate
 
 import lightning as L
+from lightning.pytorch.callbacks import RichProgressBar
+from loguru import logger
 import torch
 import wandb
 import xarray as xr
-from lightning.pytorch.callbacks import RichProgressBar
 
 from deeprec.data import DeepRecDataModule
 from deeprec.utils import ROOT_DIR, wandb_checkpoint_download
@@ -106,10 +107,10 @@ def predict(
 
     # Save in Zarr storage
     store_path = ROOT_DIR / zarr_store
-    print(f"Writing prediction '{pred_name}' to zarr store '{store_path}...")
+    logger.info(f"Writing prediction '{pred_name}' to zarr store '{store_path}...")
     store_path.parent.mkdir(parents=True, exist_ok=True)
     pred_ds = pred_ds.chunk({"lat": 120, "lon": 120}).to_zarr(store_path, mode="a")
-    print("Completed successfully.")
+    logger.info("Completed successfully.")
 
 
 if __name__ == "__main__":

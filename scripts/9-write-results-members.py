@@ -9,10 +9,11 @@ Help on the usage:
 import argparse
 from pathlib import Path
 
-import numpy as np
-import xarray as xr
 from dask.diagnostics import ProgressBar
+from loguru import logger
+import numpy as np
 from omegaconf import OmegaConf
+import xarray as xr
 
 from deeprec.preprocessing import calculate_grace_anomaly
 from deeprec.utils import generate_acdd_metadata, month_center_range
@@ -96,9 +97,9 @@ def main():
     # Write file
     out_dir.mkdir(parents=True, exist_ok=True)
     file_path = out_dir / (ds_attrs["title"] + ".nc")
-    print(f"Writing {file_path}...")
+    logger.info("Writing {}...", file_path)
     ds.to_netcdf(file_path, mode="w", engine="h5netcdf")
-    print("Successfully completed.")
+    logger.info("Successfully completed.")
 
 
 def split_pred_uncertainty(ds: xr.Dataset) -> tuple[xr.Dataset, xr.Dataset]:

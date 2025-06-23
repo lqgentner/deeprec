@@ -10,10 +10,11 @@ import argparse
 from pydoc import locate
 
 import lightning as L
-import torch
-import wandb
 from lightning.pytorch.callbacks import RichProgressBar
 from lightning.pytorch.loggers import WandbLogger
+from loguru import logger
+import torch
+import wandb
 
 from deeprec.data import DeepRecDataModule
 from deeprec.training import define_wandb_metrics
@@ -85,8 +86,11 @@ def test(wandb_project: str, wandb_run_id: str, alias: str = "best") -> None:
 
     # Define metrics
     define_wandb_metrics()
-    # Print data summary
-    print(dm.split_stats, dm.variables, sep="\n")
+    # Write data summary
+    logger.info("Training with the following split:")
+    logger.info(dm.split_stats)
+    logger.info("Training with the following variables:")
+    logger.info(dm.variables)
 
     # Fit and test
     trainer.test(model, datamodule=dm, ckpt_path=ckpt_file)

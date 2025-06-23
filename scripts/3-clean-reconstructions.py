@@ -1,22 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Clean the reconstruction products by Humphrey, Li, and Yin.
+Clean the reconstruction products by Humphrey, Li, and Yin, and Palazzoli
 Usage:
     python scripts/3-clean-reconstructions.py
 """
 
 from pathlib import Path
 
-import janitor  # noqa
+from dask.diagnostics import ProgressBar
+import janitor  # noqa: F401
+from loguru import logger
 import numpy as np
 import pandas as pd
 import xarray as xr
 import zarr
-from dask.diagnostics import ProgressBar
 
-from deeprec.utils import ROOT_DIR
 from deeprec.preprocessing import calculate_grace_anomaly
+from deeprec.utils import ROOT_DIR
 
 CHUNKS = chunks = {"time": -1, "lat": 120, "lon": 120}
 
@@ -26,46 +27,44 @@ def main():
 
     out_store = ROOT_DIR / "data/processed/reconstructions.zarr"
 
-    hum_dir = (
+    hum_gsfc = (
         ROOT_DIR
         / "data/raw/reconstructions/humphrey"
         / "01_monthly_grids_ensemble_means_allmodels"
+        / "GRACE_REC_v03_GSFC_ERA5_monthly_ensemble_mean.nc"
     )
-    hum_gsfc = hum_dir / "GRACE_REC_v03_GSFC_ERA5_monthly_ensemble_mean.nc"
-    hum_jpl = hum_dir / "GRACE_REC_v03_JPL_ERA5_monthly_ensemble_mean.nc"
 
     li_csr = ROOT_DIR / "data/raw/reconstructions/li/GRID_CSR_GRACE_REC.mat"
 
-    yin_dir = ROOT_DIR / "data/raw/reconstructions/yin"
-    yin_gsfc = yin_dir / "GSFC-based%20GTWS-MLrec%20TWS.nc"
-    yin_csr = yin_dir / "CSR-based%20GTWS-MLrec%20TWS.nc"
-    yin_jpl = yin_dir / "JPL-based%20GTWS-MLrec%20TWS.nc"
+    yin_csr = (
+        ROOT_DIR / "data/raw/reconstructions/yin" / "CSR-based%20GTWS-MLrec%20TWS.nc"
+    )
 
-    palazzoli_jpl = ROOT_DIR / "data/raw/reconstructions/palazzoli/GRAiCE_BiLSTM.nc"
+    pal_jpl = ROOT_DIR / "data/raw/reconstructions/palazzoli/GRAiCE_BiLSTM.nc"
 
     # Perform cleaning
-    print("Prepare reconstructions...")
+    logger.info("Prepare reconstructions...")
     ds_list = [
         clean_humphrey(hum_gsfc, "gsfc"),
-        clean_humphrey(hum_jpl, "jpl"),
+        # clean_humphrey(hum_jpl, "jpl"),
         clean_li(li_csr, "csr"),
-        clean_yin(yin_gsfc, "gsfc"),
         clean_yin(yin_csr, "csr"),
-        clean_yin(yin_jpl, "jpl"),
-        clean_palazzoli(palazzoli_jpl, "jpl"),
+        # clean_yin(yin_gsfc, "gsfc"),
+        # clean_yin(yin_jpl, "jpl"),
+        clean_palazzoli(pal_jpl, "jpl"),
     ]
     recs = xr.merge(ds_list).chunk(CHUNKS).astype("float32")
 
     # Save to Zarr store
-    print("Write Reconstructions to Zarr store:")
+    logger.info("Write Reconstructions to Zarr store:")
     delayed = recs.to_zarr(out_store, mode="w", compute=False)
     with ProgressBar():
         delayed.compute()
 
-    # Print Zarr structure
-    print("Zarr store structure:")
+    # Display Zarr structure
+    logger.info("Zarr store structure:")
     zgroup = zarr.open(out_store)
-    print(zgroup.tree())
+    logger.info(zgroup.tree())
 
 
 def clean_humphrey(file: Path, target_name: str) -> xr.Dataset:

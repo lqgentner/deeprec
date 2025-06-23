@@ -10,10 +10,11 @@ import argparse
 from pathlib import Path
 from typing import Any
 
+from dask.diagnostics import ProgressBar
+from loguru import logger
+from omegaconf import OmegaConf
 import pandas as pd
 import xarray as xr
-from dask.diagnostics import ProgressBar
-from omegaconf import OmegaConf
 
 from deeprec.utils import generate_acdd_metadata, month_center_range
 
@@ -81,9 +82,9 @@ def main():
     # Write file
     out_dir.mkdir(parents=True, exist_ok=True)
     file_path = out_dir / (ds_attrs["title"] + ".nc")
-    print(f"Writing {file_path}...")
+    logger.info("Writing {}...", file_path)
     ds.to_netcdf(file_path, mode="w", engine="h5netcdf")
-    print("Successfully completed.")
+    logger.info("Successfully completed.")
 
 
 def create_dynamic_attrs(ds: xr.Dataset) -> dict[str, Any]:

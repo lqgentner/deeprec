@@ -6,10 +6,12 @@ Usage:
     python scripts/4-model-train.py <config YAML path>
 """
 
-import torch
 from lightning.pytorch.cli import LightningCLI
+from loguru import logger
 from omegaconf import OmegaConf
+import torch
 import wandb
+
 from deeprec.data import DeepRecDataModule
 from deeprec.training import define_wandb_metrics
 
@@ -39,7 +41,10 @@ def main() -> None:
     dm = cli.datamodule
     config = cli.config
 
-    print(dm.split_stats, dm.variables, sep="\n")
+    logger.info("Training with the following split:")
+    logger.info(dm.split_stats)
+    logger.info("Training with the following variables:")
+    logger.info(dm.variables)
 
     # Set up W&B
     project = config.trainer.logger.init_args.project

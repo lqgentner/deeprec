@@ -13,11 +13,12 @@ from pathlib import Path
 from typing import Any
 
 import dask
-import xarray as xr
-import zarr
 from dask.diagnostics import ProgressBar
+from loguru import logger
 from omegaconf import OmegaConf
 from tqdm.std import tqdm
+import xarray as xr
+import zarr
 
 from deeprec.preprocessing import preprocessors as pp
 from deeprec.utils import ROOT_DIR
@@ -41,7 +42,7 @@ def main() -> None:
     args = parser.parse_args()
 
     # Load configs
-    config_dict = dict(OmegaConf.load(args.config_file))
+    config_dict = OmegaConf.to_container(OmegaConf.load(args.config_file))
 
     out_dir = Path(config_dict["out_dir"])
     config_inps: list[dict] = config_dict["inputs"]
@@ -49,7 +50,7 @@ def main() -> None:
     config_feng: list[dict] = config_dict["engineering"]
 
     # Process dataset
-    print("Load and process datasets lazily:")
+    logger.info("Load and process datasets lazily:")
     inps = process_datasets(config_inps)
     tgts = process_datasets(config_tgts)
 
@@ -58,7 +59,7 @@ def main() -> None:
     tgts_ds = xr.merge(tgts).chunk(space_chunks)
 
     # Engineer additional inputs
-    print("Perform feature engineering...")
+    logger.info("Perform feature engineering...")
     inps_ds = engineer_features(inps_ds, config_feng)
 
     # Save as Zarr
@@ -70,16 +71,16 @@ def main() -> None:
     delayed_tgts = tgts_ds.to_zarr(zarr_tgts, mode="w", compute=False)
 
     with ProgressBar():
-        print("Write inputs to Zarr store:")
+        logger.info("Write inputs to Zarr store:")
         delayed_inps.compute()
-        print("Writing targets to Zarr store:")
+        logger.info("Writing targets to Zarr store:")
         delayed_tgts.compute()
-    print("Processing completed.")
+    logger.info("Processing completed.")
 
     # Inspect zarr stores
-    print("Zarr stores structure:")
+    logger.info("Zarr stores structure:")
     zgroup = zarr.open(out_dir)
-    print(zgroup.tree())
+    logger.info(zgroup.tree())
 
 
 def process_datasets(config: list[dict]) -> list[xr.Dataset]:

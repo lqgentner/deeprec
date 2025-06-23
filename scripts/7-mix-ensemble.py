@@ -9,9 +9,10 @@ Help on the usage:
 import argparse
 from pathlib import Path
 
+from dask.diagnostics import ProgressBar
+from loguru import logger
 import numpy as np
 import xarray as xr
-from dask.diagnostics import ProgressBar
 
 from deeprec.preprocessing import calculate_grace_anomaly
 
@@ -39,25 +40,25 @@ def main():
 
     # Log status
     member_names = list(ds_mean.data_vars)
-    print(f"Ensemble with {len(member_names)} members found:")
-    print(member_names)
+    logger.info("Ensemble with {} members found:", len(member_names))
+    logger.info(member_names)
     if has_uncertainty:
-        print("Predictions of mean and scale parameter found.")
+        logger.info("Predictions of mean and scale parameter found.")
     else:
-        print("Only predictions of mean found.")
+        logger.info("Only predictions of mean found.")
 
     # Calculate mean of mixture
     da_mean = ds_mean.to_dataarray("member").astype(np.float64)
-    print("Calculating mean of mixture...")
+    logger.info("Calculating mean of mixture...")
     da_mean_mix = da_mean.mean("member").compute()
 
     if has_uncertainty:
         da_scale = ds_scale.to_dataarray("member").astype(np.float64)
         # Aleatoric variance of mixture
-        print("Calculating aleatoric uncertainty of mixture...")
+        logger.info("Calculating aleatoric uncertainty of mixture...")
         da_var_ale_mix = (2 * da_scale**2).mean("member").compute()
         # Epistemic variance of mixture
-        print("Calculating epistemic uncertainty of mixture...")
+        logger.info("Calculating epistemic uncertainty of mixture...")
         da_var_epi_mix = ((da_mean**2).mean("member") - da_mean_mix**2).compute()
         # Total variance of mixture
         da_var_mix = da_var_ale_mix + da_var_epi_mix
@@ -78,7 +79,7 @@ def main():
         ds_out["sigma_ale"] = da_sig_ale_mix
 
     # Save as Zarr
-    print("Writing to Zarr store...")
+    logger.info("Writing to Zarr store...")
     out_store = Path(args.out_store)
     out_store.parent.mkdir(exist_ok=True)
     (
@@ -87,7 +88,7 @@ def main():
         .to_zarr(out_store, mode="w")
     )
 
-    print("Completed successfully.")
+    logger.info("Completed successfully.")
 
 
 def split_pred_uncertainty(ds: xr.Dataset) -> tuple[xr.Dataset, xr.Dataset]:

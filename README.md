@@ -119,7 +119,7 @@ To replicate our analysis, run the scripts in the folder of the same name.
 
 - Train a model (requires a GPU and a [Weights & Biases](https://wandb.ai/site/) account):
 
-        python scripts/4-model-train.py config/model-configs/train-era.yaml
+        python scripts/4-model-train.py --config config/model-configs/train-era.yaml
 
 - Evaluate a model on the test set:
 

@@ -160,9 +160,11 @@ class DatasetDownloader:
                 short_name="TELLUS_GRAC-GRFO_MASCON_CRI_GRID_RL06.3_V4"
             )
             download_dir = self.dl_path / "targets/jpl-mascons"
+            if files := list(download_dir.glob("GRCTellus.JPL.*.nc")):
+                logger.info("File(s) already exists: {}", files)
+                return
             download_dir.mkdir(parents=True, exist_ok=True)
             earthaccess.download(results, download_dir)
-            logger.info("Downloaded JPL Mascons: {len(files)} files")
         except Exception as e:
             logger.error("Failed to download JPL Mascons: {}", e)
 
@@ -323,7 +325,7 @@ class DatasetDownloader:
             file_path = self.download_file(url, download_dir)
             # Extract ZIP
             with ZipFile(file_path) as zip:
-                zip.extractall(path=file_path)
+                zip.extractall(path=download_dir)
 
             # Yin, 2023
             url = "https://zenodo.org/records/10040927/files/CSR-based%20GTWS-MLrec%20TWS.nc"
@@ -358,6 +360,11 @@ class DatasetDownloader:
             # Extreme Event Intensity
             url = "https://zenodo.org/records/7599831/files/Figure2_data.xlsx"
             download_dir = self.dl_path / "eval/intensity/rodell"
+            self.download_file(url, download_dir)
+
+            # SLR/DORIS
+            url = "https://zenodo.org/records/15065209/files/IGG_SLR_DORIS_A_EWH_Land_1995-2015.nc"
+            download_dir = self.dl_path / "eval/slr_doris/boerger"
             self.download_file(url, download_dir)
 
         except Exception as e:

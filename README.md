@@ -4,6 +4,8 @@
     <img src="figures/cover/cover_southamerica.png" alt="Globe showing reconstructed TWS anomaly of a single month" width="300"/>
 <p align="center">
 
+## Description
+
 This repository contains the code base used to create the results presented in "DeepRec: Global Terrestrial Water Storage Reconstruction Since 1941 Using Spatiotemporal-Aware Deep Learning Model". The data processing, model training and evaluation is implemented in Python and heavily depends on the packages [xarray](https://docs.xarray.dev/en/stable/), [PyTorch](https://pytorch.org/docs/stable/index.html), and [PyTorch Lightning](https://lightning.ai/docs/pytorch/stable/).
 
 ## Project structure
@@ -32,7 +34,7 @@ This repository contains the code base used to create the results presented in "
 
 The project structure is based on the [Cookiecutter Data Science](https://cookiecutter-data-science.drivendata.org/) project template.
 
-## Replicating the analysis
+## Installation
 
 Clone this repository to a directory of your choice:
 
@@ -94,3 +96,47 @@ If you want to download the data sets required for model training or want to run
     pip install -e ".[interactive]"
     # For installing all optional dependencies
     pip install -e ".[complete]"
+
+## Usage
+
+To replicate our analysis, run the scripts in the folder of the same name.
+
+- Download all datasets. This requires NASA Earthdata account credentials saved in a `.netrc` file ([how to](https://urs.earthdata.nasa.gov/documentation/for_users/data_access/curl_and_wget)) and a Copernicus CDS API token saved in a `.cdsapirc` ([how to](https://cds.climate.copernicus.eu/how-to-api)) file:
+
+        python scripts/0-download-data.py
+
+- Preprocess the inputs and targets (time step alignment, resampling, anomaly calculation, ...):
+
+        python scripts/1-preprocess-data.py config/preprocessing_config.yaml
+
+- Preprocess the basin and country shapes:
+
+        python scripts/2-clean-shapefiles.py
+
+- Preprocess the previous TWSA reconstructions and simulations:
+
+        python scripts/3-clean-reconstructions.py
+
+- Train a model (requires a GPU and a [Weights & Biases](https://wandb.ai/site/) account):
+
+        python scripts/4-model-train.py config/model-configs/train-era.yaml
+
+- Evaluate a model on the test set:
+
+        python scripts/5-model-test.py --help
+
+- Generate the TWSA reconstruction for a trained model:
+
+        python scripts/6-model-predict.py --help
+
+- Combine uncertainty estimates of individual models (deep ensemble approach):
+
+        python scripts/7-mix-ensemble.py --help
+
+- Save ensemble mixture (mean TWSA and combined predictive uncertainty) as netCDF file
+
+        python scripts/8-write-results-mixture.py config/output-configs/mixture-era.yaml
+
+- Save individual model predictions as netCDF file
+
+        python scripts/9-write-results-members.py config/output-configs/members-era.yaml

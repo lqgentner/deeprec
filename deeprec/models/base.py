@@ -16,7 +16,7 @@ class BaseModel(L.LightningModule):
         self,
         weight_lat: bool = False,
         loss: Literal[
-            "mae", "mse", "rmse", "huber", "nse", "nll_normal", "nll_laplace"
+            "mae", "mse", "rmse", "huber", "nll_normal", "nll_laplace"
         ] = "huber",
         **kwargs,
     ):
@@ -26,9 +26,9 @@ class BaseModel(L.LightningModule):
         kwargs.setdefault("lr", 1e-3)
         kwargs.setdefault("weight_decay", 5e-3)
         kwargs.setdefault("eta_min", 1e-5)
+        self.weight_lat = weight_lat
         self.save_hyperparameters()
 
-        self.metric_req_stds = False
         self.return_uncertainty = False
 
         match loss:
@@ -40,9 +40,6 @@ class BaseModel(L.LightningModule):
                 self.metric = losses.rmse
             case "huber":
                 self.metric = losses.huber
-            case "nse":
-                self.metric = losses.nse
-                self.metric_req_stds = True
             case "nll_normal":
                 self.metric = losses.nll_normal
                 self.return_uncertainty = True
@@ -76,12 +73,13 @@ class BaseModel(L.LightningModule):
         inputs: dict[str, Tensor] = batch["inputs"]
         target: Tensor = batch["target"]
         weight: Tensor = batch["weight"]
-        std: Tensor = batch["std"]
 
         preds: Tensor = self(**inputs)
 
         loss, rmse, mae = self._compute_metrics_and_loss(
-            preds=preds, target=target, weight=weight, std=std
+            preds=preds,
+            target=target,
+            weight=weight,
         )
 
         self.log("train_loss", loss, prog_bar=True)
@@ -129,12 +127,13 @@ class BaseModel(L.LightningModule):
         inputs: dict[str, Tensor] = batch["inputs"]
         target: Tensor = batch["target"]
         weight: Tensor = batch["weight"]
-        std: Tensor = batch["std"]
 
         preds: Tensor = self(**inputs)
 
         loss, rmse, mae = self._compute_metrics_and_loss(
-            preds=preds, target=target, weight=weight, std=std
+            preds=preds,
+            target=target,
+            weight=weight,
         )
 
         self.log(f"{prefix}_loss", loss, prog_bar=True, sync_dist=True)
@@ -151,18 +150,12 @@ class BaseModel(L.LightningModule):
         preds: Tensor,
         target: Tensor,
         weight: Tensor,
-        std: Tensor,
     ) -> tuple[Tensor, Tensor, Tensor]:
-        # Compute loss conditionally based on whether stds and weights are required
-        metric_kwargs = {"preds": preds, "target": target}
-
-        if self.hparams.weight_lat:
-            metric_kwargs["weight"] = weight
-        if self.metric_req_stds:
-            metric_kwargs["std"] = std
-
-        # Compute metrics
-        loss = self.metric(**metric_kwargs)
+        # Compute loss conditionally based on whether weights are required
+        if self.weight_lat:
+            loss = self.metric(preds=preds, target=target, weight=weight)
+        else:
+            loss = self.metric(preds=preds, target=target)
 
         if self.return_uncertainty:
             # extract actual predictions (mu) before calculating default metrics

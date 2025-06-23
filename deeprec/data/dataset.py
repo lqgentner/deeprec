@@ -1,31 +1,63 @@
+from dataclasses import dataclass
+
 import torch
 from torch import Tensor
 from torch.utils.data import Dataset
 
 
+@dataclass
+class DeepRecTensors:
+    """
+    Container for all tensors required by DeepRecDataset.
+
+    Attributes
+    ----------
+    lookup : Tensor
+        Lookup table mapping from sample index to (time, lat, lon) indices.
+    tensor_inputs : Tensor | None
+        3D input variables (time, lat, lon) as tensor, or None if not used.
+    matrix_inputs : Tensor | None
+        2D input variables (lat, lon) as tensor, or None if not used.
+    vector_inputs : Tensor | None
+        1D input variables (time,) as tensor, or None if not used.
+    scalar_inputs : Tensor | None
+        0D input variables as tensor, or None if not used.
+    target : Tensor | None
+        Target variable as tensor, or None if not used (e.g., in prediction).
+    weight : Tensor | None
+        Latitude weights as tensor, or None if not used.
+    """
+
+    lookup: Tensor
+    tensor_inputs: Tensor | None
+    matrix_inputs: Tensor | None
+    vector_inputs: Tensor | None
+    scalar_inputs: Tensor | None
+    target: Tensor | None
+    weight: Tensor | None
+
+
 class DeepRecDataset(Dataset):
     def __init__(
         self,
-        lookup: Tensor,
-        tensor_inputs: Tensor | None,
-        matrix_inputs: Tensor | None,
-        vector_inputs: Tensor | None,
-        scalar_inputs: Tensor | None,
-        target: Tensor | None,
-        weight: Tensor | None,
-        std: Tensor | None,
+        tensors: DeepRecTensors,
         space_window: int,
         time_window: int,
     ) -> None:
         super().__init__()
 
         # Infer spatial extension
-        for inputs in [tensor_inputs, matrix_inputs, vector_inputs, scalar_inputs]:
+        for inputs in [
+            tensors.tensor_inputs,
+            tensors.matrix_inputs,
+            tensors.vector_inputs,
+            tensors.scalar_inputs,
+        ]:
             if inputs is not None:
                 nlat = inputs.size(2)
                 nlon = inputs.size(3)
                 break
-        else:  # No break block
+        else:
             raise ValueError("No inputs provided, at least one is required.")
 
         # Space window
@@ -40,14 +72,13 @@ class DeepRecDataset(Dataset):
         past_steps = time_window - 1
 
         # Set attributes
-        self.inp_scalar = scalar_inputs
-        self.inp_vector = vector_inputs
-        self.inp_matrix = matrix_inputs
-        self.inp_tensor = tensor_inputs
-        self.target = target
-        self.weight = weight
-        self.std = std
-        self.lookup = lookup
+        self.lookup = tensors.lookup
+        self.tensor_inputs = tensors.tensor_inputs
+        self.matrix_inputs = tensors.matrix_inputs
+        self.vector_inputs = tensors.vector_inputs
+        self.scalar_inputs = tensors.scalar_inputs
+        self.target = tensors.target
+        self.weight = tensors.weight
         self.half_patchwidth = half_patchwidth
         self.past_steps = past_steps
         self.nlat = nlat
@@ -56,13 +87,8 @@ class DeepRecDataset(Dataset):
         return
 
     def __getitem__(self, index) -> dict[str, Tensor | dict[str, Tensor]]:
-        """If a target variable was provided, returns a tuple containing a dictionary of the inputs
-        and the target. If no target was provided, only the input dictionary is returned.
-        """
+        """Returns a single sample."""
         time_idx, lat_idx, lon_idx = self.lookup[index]
-
-        data = {}
-        inputs = {}
 
         # Calculate extend of time and space windows
         time_min = time_idx - self.past_steps
@@ -72,6 +98,9 @@ class DeepRecDataset(Dataset):
         lat_max = lat_idx + self.half_patchwidth + 1
         lon_min = lon_idx - self.half_patchwidth
         lon_max = lon_idx + self.half_patchwidth + 1
+
+        lats: Tensor | slice
+        lons: Tensor | slice
 
         # Check if space window extension is within index ranges
         if lat_min < 0 or lat_max >= self.nlat or lon_min < 0 or lon_max >= self.nlon:
@@ -86,36 +115,43 @@ class DeepRecDataset(Dataset):
             # Latitude and longitude are continuous, use standard indexing with slices
             lats, lons = slice(lat_min, lat_max), slice(lon_min, lon_max)
 
+        # Build input dictionary
+        inputs: dict[str, Tensor] = {}
+
         # Create scalars
-        if self.inp_scalar is not None:
-            xs = self.inp_scalar[:, time_idx, lat_idx, lon_idx]
-            inputs["scalar_inputs"] = xs
+        if self.scalar_inputs is not None:
+            inputs["scalar_inputs"] = self.scalar_inputs[:, time_idx, lat_idx, lon_idx]
 
         # Create vectors, 1D time series (time,)
-        if self.inp_vector is not None:
-            xv = self.inp_vector[:, time_min:time_max, lat_idx, lon_idx]
-            inputs["vector_inputs"] = xv
+        if self.vector_inputs is not None:
+            inputs["vector_inputs"] = self.vector_inputs[
+                :, time_min:time_max, lat_idx, lon_idx
+            ]
 
         # Create matrices, 2D patches (lat, lon)
-        if self.inp_matrix is not None:
+        if self.matrix_inputs is not None:
             # Flip latitude axis (+90° to -90°)
-            xm = self.inp_matrix[:, time_idx, lats, lons].flip(1)
-            inputs["matrix_inputs"] = xm
+            inputs["matrix_inputs"] = self.matrix_inputs[:, time_idx, lats, lons].flip(
+                1
+            )
 
         # Create tensors, 3D cubes (time, lat, lon)
-        if self.inp_tensor is not None:
+        if self.tensor_inputs is not None:
             # Flip latitude axis (+90° to -90°)
-            xt = self.inp_tensor[:, time_min:time_max, lats, lons].flip(2)
-            inputs["tensor_inputs"] = xt
+            inputs["tensor_inputs"] = self.tensor_inputs[
+                :, time_min:time_max, lats, lons
+            ].flip(2)
 
-        data["inputs"] = inputs
+        # Build sample dictionary
+        sample: dict[str, Tensor | dict[str, Tensor]] = {}
+
+        sample["inputs"] = inputs
         # Return target and additional arguments in train/val/test phase
-        if self.target is not None:
-            data["target"] = self.target[index]
-            data["weight"] = self.weight[lat_idx]
-            data["std"] = self.std[lat_idx, lon_idx]
+        if self.target is not None and self.weight is not None:
+            sample["target"] = self.target[index]
+            sample["weight"] = self.weight[lat_idx]
 
-        return data
+        return sample
 
     def __len__(self) -> int:
         return len(self.lookup)

@@ -1,22 +1,23 @@
+from pathlib import Path
 from typing import Literal
 
 import dask
 import lightning as L
 import numpy as np
 import pandas as pd
-import torch
-import xarray as xr
 from tabulate import tabulate
+import torch
 from torch import Tensor
 from torch.utils.data import DataLoader
+import xarray as xr
 
 import deeprec  # noqa
-from deeprec.data.dataset import DeepRecDataset
-from deeprec.preprocessing import RobustScaler, StandardScaler
-from deeprec.regions import select_basins, select_continents, select_countries
+from deeprec.data.dataset import DeepRecDataset, DeepRecTensors
+from deeprec.preprocessing.scalers import AbstractScaler, RobustScaler, StandardScaler
+from deeprec.regions import select_basins, select_countries
 from deeprec.utils import ROOT_DIR
 
-Region = Literal["basins", "continents", "countries"]
+Region = Literal["basins", "countries"]
 Scaler = Literal["standard", "robust"]
 Partition = Literal["train", "val", "test", "predict"]
 
@@ -36,7 +37,7 @@ class DeepRecDataModule(L.LightningDataModule):
     - Tensor (3D: time x latitude x longitude)
 
     The module also allows for the selection of specific geographic regions
-    (basins, continents, countries) for analysis and utilizes robust or standard scaling methods
+    (basins, countries) for analysis and utilizes robust or standard scaling methods
     to normalize the data.
     """
 
@@ -49,9 +50,9 @@ class DeepRecDataModule(L.LightningDataModule):
         vector_input_vars: list[str] | None = None,
         matrix_input_vars: list[str] | None = None,
         tensor_input_vars: list[str] | None = None,
-        train_split: list[str, str] | None = None,
-        val_split: list[str, str] | None = None,
-        test_split: list[str, str] | None = None,
+        train_split: tuple[str, str] | None = None,
+        val_split: tuple[str, str] | None = None,
+        test_split: tuple[str, str] | None = None,
         scale_method: Scaler | None = None,
         space_window: int = 25,
         time_window: int = 1,
@@ -64,17 +65,17 @@ class DeepRecDataModule(L.LightningDataModule):
         ----------
         data_dir: str:
             Path to the directory containing the Zarr datasets for inputs and targets.
-        train_split: tuple[datetime, datetime]
+        train_split: tuple[str, str]
             Start and end dates for the training dataset partition. If not provided,
             train on all time steps which are not in the validation or test partition.
             Defaults to None.
-        val_split: tuple[datetime, datetime], optional
+        val_split: tuple[str, str], optional
             Start and end dates for the validation dataset partition. Defaults to None.
-        test_split: tuple[datetime, datetime], optional
+        test_split: tuple[str, str], optional
             Start and end dates for the test dataset partition. Defaults to None.
         coverage: dict[Region, list[str]]
             A dictionary specifying the geographic regions to include
-            in the analysis. The keys are region types ('basins', 'continents', 'countries'), and
+            in the analysis. The keys are region types ('basins', 'countries'), and
             the values are lists of region names.
         target_var: str
             The name of the target variable in the dataset.
@@ -102,12 +103,14 @@ class DeepRecDataModule(L.LightningDataModule):
         super().__init__()
 
         # Load data
-        data_dir = ROOT_DIR / data_dir
-        inputs_orig = xr.open_zarr(data_dir / "inputs.zarr")
-        targets_orig = xr.open_zarr(data_dir / "targets.zarr")
+        data_path = Path(data_dir)
+        if not data_path.is_absolute():
+            data_path = ROOT_DIR / data_path
+        inputs_orig = xr.open_zarr(data_path / "inputs.zarr")
+        targets_orig = xr.open_zarr(data_path / "targets.zarr")
 
         # Select inputs and target
-        input_vars = []
+        input_vars: list[str] = []
         for inp in [
             tensor_input_vars,
             matrix_input_vars,
@@ -186,8 +189,6 @@ class DeepRecDataModule(L.LightningDataModule):
             if isinstance(region_list, str):
                 region_list = [region_list]
             match region_type:
-                case "continents":
-                    mask = select_continents(mask, region_list, return_region=False)
                 case "countries":
                     mask = select_countries(mask, region_list, return_region=False)
                 case "basins":
@@ -213,6 +214,7 @@ class DeepRecDataModule(L.LightningDataModule):
         target = target.where(mask == 1)
 
         # Scale inputs
+        scaler: AbstractScaler | None
         match scale_method:
             case "standard":
                 scaler = StandardScaler()
@@ -250,11 +252,11 @@ class DeepRecDataModule(L.LightningDataModule):
         self._space_window = space_window
         self._time_window = time_window
         self._dl_kwargs = dl_kwargs
-        # Dicts of PyTorch tensors, assigned in _prepare_tensors
-        self._train_tensors = None
-        self._val_tensors = None
-        self._test_tensors = None
-        self._predict_tensors = None
+        # Containers of PyTorch tensors, assigned in _prepare_tensors
+        self._train_tensors: DeepRecTensors | None = None
+        self._val_tensors: DeepRecTensors | None = None
+        self._test_tensors: DeepRecTensors | None = None
+        self._predict_tensors: DeepRecTensors | None = None
 
     def setup(self, stage: str) -> None:
         """Creates dictionaries with PyTorch tensors of all inputs,
@@ -290,9 +292,13 @@ class DeepRecDataModule(L.LightningDataModule):
                 raise ValueError(f"Unknown stage {stage}.")
 
     def train_dataloader(self) -> DataLoader:
+        if self._train_tensors is None:
+            raise TypeError(
+                "Training tensors have not been prepared. Call setup('fit') first."
+            )
         return DataLoader(
             DeepRecDataset(
-                **self._train_tensors,
+                self._train_tensors,
                 space_window=self._space_window,
                 time_window=self._time_window,
             ),
@@ -301,9 +307,13 @@ class DeepRecDataModule(L.LightningDataModule):
         )
 
     def val_dataloader(self) -> DataLoader:
+        if self._val_tensors is None:
+            raise TypeError(
+                "Validation tensors have not been prepared. Call setup('fit') or setup('validate') first."
+            )
         return DataLoader(
             DeepRecDataset(
-                **self._val_tensors,
+                self._val_tensors,
                 space_window=self._space_window,
                 time_window=self._time_window,
             ),
@@ -312,9 +322,13 @@ class DeepRecDataModule(L.LightningDataModule):
         )
 
     def test_dataloader(self) -> DataLoader:
+        if self._test_tensors is None:
+            raise TypeError(
+                "Testing tensors have not been prepared. Call setup('test') first."
+            )
         return DataLoader(
             DeepRecDataset(
-                **self._test_tensors,
+                self._test_tensors,
                 space_window=self._space_window,
                 time_window=self._time_window,
             ),
@@ -323,9 +337,13 @@ class DeepRecDataModule(L.LightningDataModule):
         )
 
     def predict_dataloader(self) -> DataLoader:
+        if self._predict_tensors is None:
+            raise TypeError(
+                "Prediction tensors have not been prepared. Call setup('test') first."
+            )
         return DataLoader(
             DeepRecDataset(
-                **self._predict_tensors,
+                self._predict_tensors,
                 space_window=self._space_window,
                 time_window=self._time_window,
             ),
@@ -450,7 +468,7 @@ class DeepRecDataModule(L.LightningDataModule):
             pred = pred.cpu().numpy()
 
         # Create coordinate template
-        with dask.config.set(**{"array.slicing.split_large_chunks": False}):
+        with dask.config.set({"array.slicing.split_large_chunks": False}):
             if partition == "predict":
                 # Extract DataArray from inputs with length of predictions
                 ones = np.ones(
@@ -505,7 +523,7 @@ class DeepRecDataModule(L.LightningDataModule):
 
                     xr_pred = xr.merge([da_pred, da_uncert]).dr.unstack_spacetime()
                 case d:
-                    return ValueError(f"Tensors with {d} dimensions not supported.")
+                    raise ValueError(f"Tensors with {d} dimensions not supported.")
             # Restore global extend (otherwise, some empty lat/lon col/rows will be missing)
             if restore_global_extend:
                 xr_pred = xr_pred.reindex_like(self._inputs.drop_dims("time"))
@@ -550,7 +568,6 @@ class DeepRecDataModule(L.LightningDataModule):
 
     def _create_lookup(
         self,
-        mask: xr.DataArray,
         inputs: xr.DataArray,
         target: xr.DataArray | None = None,
     ) -> np.ndarray:
@@ -594,7 +611,7 @@ class DeepRecDataModule(L.LightningDataModule):
 
         return lookup
 
-    def _prepare_tensors(self, partition: Partition) -> dict[str, Tensor]:
+    def _prepare_tensors(self, partition: Partition) -> DeepRecTensors:
         print(f"DataModule: Preparing {partition} tensors...")
         # Partition inputs and target
         match partition:
@@ -618,44 +635,43 @@ class DeepRecDataModule(L.LightningDataModule):
                 inputs = self._inputs
                 target = None
                 weight = None
-                std = None
             case _:
                 raise ValueError(f"Unknown partiton {partition}.")
 
         # Convert inputs to DataArray
         inputs = inputs.to_dataarray("feature")
 
+        scalar_inputs: Tensor | None = None
+        vector_inputs: Tensor | None = None
+        matrix_inputs: Tensor | None = None
+        tensor_inputs: Tensor | None = None
+
         # Create lookup table
-        lookup = self._create_lookup(self._mask, inputs, target)
-        lookup = torch.as_tensor(lookup, dtype=torch.int16)
+        lookup = torch.as_tensor(self._create_lookup(inputs, target), dtype=torch.int16)
 
         # Scalar inputs
         if self._scalar_input_vars is not None:
-            scalar_inputs = inputs.sel(feature=self._scalar_input_vars)
-            scalar_inputs = torch.as_tensor(scalar_inputs.values, dtype=torch.float32)
-        else:
-            scalar_inputs = None
+            scalar_inputs = torch.as_tensor(
+                inputs.sel(feature=self._scalar_input_vars).values, dtype=torch.float32
+            )
 
         # Vector inputs
         if self._vector_input_vars is not None:
-            vector_inputs = inputs.sel(feature=self._vector_input_vars)
-            vector_inputs = torch.as_tensor(vector_inputs.values, dtype=torch.float32)
-        else:
-            vector_inputs = None
+            vector_inputs = torch.as_tensor(
+                inputs.sel(feature=self._vector_input_vars).values, dtype=torch.float32
+            )
 
         # Matrix inputs
         if self._matrix_input_vars is not None:
-            matrix_inputs = inputs.sel(feature=self._matrix_input_vars)
-            matrix_inputs = torch.as_tensor(matrix_inputs.values, dtype=torch.float32)
-        else:
-            matrix_inputs = None
+            matrix_inputs = torch.as_tensor(
+                inputs.sel(feature=self._matrix_input_vars).values, dtype=torch.float32
+            )
 
         # Tensor inputs
         if self._tensor_input_vars is not None:
-            tensor_inputs = inputs.sel(feature=self._tensor_input_vars)
-            tensor_inputs = torch.as_tensor(tensor_inputs.values, dtype=torch.float32)
-        else:
-            tensor_inputs = None
+            tensor_inputs = torch.as_tensor(
+                inputs.sel(feature=self._tensor_input_vars).values, dtype=torch.float32
+            )
 
         # Target
         if target is not None:
@@ -663,23 +679,18 @@ class DeepRecDataModule(L.LightningDataModule):
             weight = np.cos(np.deg2rad(target.lat.values))
             weight = torch.as_tensor(weight, dtype=torch.float32)
 
-            # Calculate standard deviations
-            std = target.fillna(0).std(dim="time")
-            std = torch.as_tensor(std.values, dtype=torch.float32)
-
             # Reshape target dimensions (time, lat, lon) to 1D
             target = target.dr.stack_spacetime()
             target = torch.as_tensor(target.values, dtype=torch.float32)
 
             assert len(target) == len(lookup)
 
-        return {
-            "lookup": lookup,
-            "tensor_inputs": tensor_inputs,
-            "matrix_inputs": matrix_inputs,
-            "vector_inputs": vector_inputs,
-            "scalar_inputs": scalar_inputs,
-            "target": target,
-            "weight": weight,
-            "std": std,
-        }
+        return DeepRecTensors(
+            lookup=lookup,
+            tensor_inputs=tensor_inputs,
+            matrix_inputs=matrix_inputs,
+            vector_inputs=vector_inputs,
+            scalar_inputs=scalar_inputs,
+            target=target,
+            weight=weight,
+        )

@@ -36,9 +36,7 @@ def main():
 
     li_csr = ROOT_DIR / "data/raw/reconstructions/li/GRID_CSR_GRACE_REC.mat"
 
-    yin_csr = (
-        ROOT_DIR / "data/raw/reconstructions/yin" / "CSR-based%20GTWS-MLrec%20TWS.nc"
-    )
+    yin_csr = ROOT_DIR / "data/raw/reconstructions/yin/CSR-based GTWS-MLrec TWS.nc"
 
     pal_jpl = ROOT_DIR / "data/raw/reconstructions/palazzoli/GRAiCE_BiLSTM.nc"
 

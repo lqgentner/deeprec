@@ -18,7 +18,7 @@ The data processing and model training is implemented in Python and heavily depe
     │   ├── prepocessing_config.yaml    <- Data preprocessing configuration
     │   └── style_paper.mplstyle        <- Matplotlib style sheet for plots
     ├── data                            <- Raw and processed inputs (content excluded from this repository)
-    ├── deeprec                         <- Source code
+    ├── src/deeprec                     <- Source code
     │   ├── data                        <- PyTorch Lightning dataset and datamodule implementations
     │   ├── models                      <- PyTorch model implementations
     │   ├── preprocessing               <- Functions for data preprocessing

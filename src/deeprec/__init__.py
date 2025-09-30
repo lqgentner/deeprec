@@ -1,5 +1,5 @@
 """Top level module of DeepRec"""
 
-from . import accessors
+from deeprec import accessors
 
 __all__ = ["accessors"]

@@ -1,6 +1,5 @@
-from .decomposers import apply_mstl, apply_stl, detrend_vars
-from .scalers import RobustScaler, StandardScaler
-from .preprocessors import (
+from deeprec.preprocessing.decomposers import apply_mstl, apply_stl, detrend_vars
+from deeprec.preprocessing.preprocessors import (
     add_cell_area,
     add_country_exclusion_mask,
     add_epoch_time,
@@ -12,9 +11,9 @@ from .preprocessors import (
     calculate_anomaly,
     calculate_grace_anomaly,
     chunk_dataset,
-    clean_grid,
     clean_era5_attrs,
     clean_era5_coords,
+    clean_grid,
     cm2mm,
     coarsen_grid,
     decode_time,
@@ -25,6 +24,7 @@ from .preprocessors import (
     set_twsa_attrs,
     yearly2monthly,
 )
+from deeprec.preprocessing.scalers import RobustScaler, StandardScaler
 
 __all__ = [
     "add_cell_area",

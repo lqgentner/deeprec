@@ -2,7 +2,7 @@ import cf_xarray  # noqa
 import geopandas as gpd
 import regionmask
 
-from .utils import ROOT_DIR, XrObj
+from deeprec.utils import ROOT_DIR, XrObj
 
 
 def basins(

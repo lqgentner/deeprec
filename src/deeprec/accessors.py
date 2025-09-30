@@ -12,9 +12,9 @@ from xarray.computation.weighted import DataArrayWeighted, DatasetWeighted
 from xarray.core.formatting import dim_summary
 from xarray.plot.facetgrid import FacetGrid
 
-from . import regions
-from .utils import XrObj
-from .visualization import plot_basinwise_map, projplot_facet, projplot_single
+from deeprec import regions
+from deeprec.utils import XrObj
+from deeprec.visualization import plot_basinwise_map, projplot_facet, projplot_single
 
 
 # (Geo-)Pandas accessor

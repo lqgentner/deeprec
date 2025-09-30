@@ -12,8 +12,8 @@ import regionmask
 import xarray as xr
 from xarray.plot.facetgrid import FacetGrid
 
-from .regions import basins
-from .utils import verify_dim_ispresent
+from deeprec.regions import basins
+from deeprec.utils import verify_dim_ispresent
 
 
 def plot_grace_gap(ax: plt.Axes) -> Rectangle:

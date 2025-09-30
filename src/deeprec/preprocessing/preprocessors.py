@@ -11,8 +11,8 @@ from regionmask import mask_geopandas
 from shapely.geometry import box
 import xarray as xr
 
-from ..regions import countries
-from ..utils import XrObj, month_center_range
+from deeprec.regions import countries
+from deeprec.utils import XrObj, month_center_range
 
 
 def clean_grid(ds: XrObj) -> XrObj:

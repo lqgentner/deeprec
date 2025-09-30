@@ -10,7 +10,7 @@ import pandas as pd
 import wandb
 import xarray as xr
 
-ROOT_DIR = Path(__file__).resolve().parents[1]
+ROOT_DIR = Path(__file__).resolve().parents[2]
 """Absolute base path of project. All paths are defined relative to this path."""
 
 XrObj = TypeVar("XrObj", xr.Dataset, xr.DataArray)

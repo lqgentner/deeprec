@@ -208,18 +208,14 @@ class XrBaseAccessor(Generic[XrObj]):
         """
 
         extended_time = (
-            self._obj.get_index("time")
-            .append(pd.DatetimeIndex(["2018-01-01"]))
-            .sort_values()
+            self._obj.get_index("time").append(pd.DatetimeIndex(["2018-01-01"])).sort_values()
         )
         return self._obj.reindex(time=extended_time)
 
     def stack_spacetime(self, how_dropna: Literal["any", "all"] = "any") -> XrObj:
         """Creates a 1D dataset or data array from a 3D dataset or data array by stacking the dimensions ('time', 'lat', 'lon')
         to one 'sample' dimension."""
-        return self._obj.stack(sample=("time", "lat", "lon")).dropna(
-            "sample", how=how_dropna
-        )
+        return self._obj.stack(sample=("time", "lat", "lon")).dropna("sample", how=how_dropna)
 
     def unstack_spacetime(self) -> XrObj:
         """Unstacks and sorts the ("time", "lat", "lon") dimensions of the
@@ -357,9 +353,7 @@ class XrDataArrayAccessor(XrBaseAccessor):
             )
         return p
 
-    def projplot_basins(
-        self, spatial_obj: xr.DataArray, **kwargs
-    ) -> GeoQuadMesh | FacetGrid:
+    def projplot_basins(self, spatial_obj: xr.DataArray, **kwargs) -> GeoQuadMesh | FacetGrid:
         """Plot a basin-wise averaged values on a world map.
         The DataArray must have a "region" dimension corresponding to
         the river basins. Passing a spatial dummy DataArray with "lat" and "lon"
@@ -497,9 +491,7 @@ class XrDatasetAccessor(XrBaseAccessor):
             obj[var].encoding.update(**kwargs)
         return obj
 
-    def get_attrs(
-        self, variables: list[str], keys: list[str]
-    ) -> dict[str, dict[str, Any]]:
+    def get_attrs(self, variables: list[str], keys: list[str]) -> dict[str, dict[str, Any]]:
         """
         Extract attributes of multiple Dataset variables.
 
@@ -562,11 +554,5 @@ class XrDatasetAccessor(XrBaseAccessor):
         if dims is None:
             dims = ["lat", "lon"]
 
-        time_na = (
-            self._obj.to_dataarray()
-            .isnull()
-            .all(dim=dims)
-            .any(dim="variable")
-            .compute()
-        )
+        time_na = self._obj.to_dataarray().isnull().all(dim=dims).any(dim="variable").compute()
         return ~time_na

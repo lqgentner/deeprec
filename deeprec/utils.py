@@ -43,9 +43,7 @@ def conv2d_out_size(
     padding: int = 0,
     dilation: int = 1,
 ) -> int:
-    return floor(
-        (in_size + 2 * padding - dilation * (kernel_size - 1) - 1) / stride + 1
-    )
+    return floor((in_size + 2 * padding - dilation * (kernel_size - 1) - 1) / stride + 1)
 
 
 def wandb_checkpoint_download(
@@ -74,9 +72,7 @@ def wandb_checkpoint_download(
     """
     if artifact_path is None:
         if project is None or run_id is None:
-            raise ValueError(
-                "Either artifact_path or project and run_id must be provided."
-            )
+            raise ValueError("Either artifact_path or project and run_id must be provided.")
         if isinstance(alias, int):
             alias = f"v{alias}"
         artifact_path = f"{project}/model-{run_id}:{alias}"

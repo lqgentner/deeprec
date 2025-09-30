@@ -214,9 +214,7 @@ def detrend_vars(
 
     for name in names:
         # Perform decomposition
-        da = apply_stl(
-            ds[name], period=period, seasonal=seasonal, trend=trend, **stl_kwargs
-        )
+        da = apply_stl(ds[name], period=period, seasonal=seasonal, trend=trend, **stl_kwargs)
         # Extract components
         da_trend = da.sel(component="trend").drop_vars("component")
         da_seasonal = da.sel(component="seasonal").drop_vars("component")

@@ -14,9 +14,7 @@ class PretrainMixin(nn.Module):
     def forward(self, x):
         pass
 
-    def _load_weights(
-        self, ckpt_path: str | Path, submodule: str | None = None
-    ) -> None:
+    def _load_weights(self, ckpt_path: str | Path, submodule: str | None = None) -> None:
         """Load model weights from a state dict.
 
         Parameters

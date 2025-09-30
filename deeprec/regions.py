@@ -75,9 +75,7 @@ def countries(names: str | list[str] | None = None) -> gpd.GeoDataFrame:
 
     """
 
-    file = (
-        ROOT_DIR / "data/processed/shapefiles/naturalearth/ne_50m_admin_0_countries.shp"
-    )
+    file = ROOT_DIR / "data/processed/shapefiles/naturalearth/ne_50m_admin_0_countries.shp"
 
     gdf = gpd.read_file(file, engine="pyogrio")
 

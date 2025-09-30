@@ -15,9 +15,7 @@ class BaseModel(L.LightningModule):
     def __init__(
         self,
         weight_lat: bool = False,
-        loss: Literal[
-            "mae", "mse", "rmse", "huber", "nll_normal", "nll_laplace"
-        ] = "huber",
+        loss: Literal["mae", "mse", "rmse", "huber", "nll_normal", "nll_laplace"] = "huber",
         **kwargs,
     ):
         super().__init__()

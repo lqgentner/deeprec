@@ -124,23 +124,17 @@ class DeepRecDataset(Dataset):
 
         # Create vectors, 1D time series (time,)
         if self.vector_inputs is not None:
-            inputs["vector_inputs"] = self.vector_inputs[
-                :, time_min:time_max, lat_idx, lon_idx
-            ]
+            inputs["vector_inputs"] = self.vector_inputs[:, time_min:time_max, lat_idx, lon_idx]
 
         # Create matrices, 2D patches (lat, lon)
         if self.matrix_inputs is not None:
             # Flip latitude axis (+90° to -90°)
-            inputs["matrix_inputs"] = self.matrix_inputs[:, time_idx, lats, lons].flip(
-                1
-            )
+            inputs["matrix_inputs"] = self.matrix_inputs[:, time_idx, lats, lons].flip(1)
 
         # Create tensors, 3D cubes (time, lat, lon)
         if self.tensor_inputs is not None:
             # Flip latitude axis (+90° to -90°)
-            inputs["tensor_inputs"] = self.tensor_inputs[
-                :, time_min:time_max, lats, lons
-            ].flip(2)
+            inputs["tensor_inputs"] = self.tensor_inputs[:, time_min:time_max, lats, lons].flip(2)
 
         # Build sample dictionary
         sample: dict[str, Tensor | dict[str, Tensor]] = {}

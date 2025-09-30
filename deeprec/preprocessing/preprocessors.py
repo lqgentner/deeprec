@@ -6,10 +6,10 @@ from typing import Any
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-import xarray as xr
 from pandas.tseries.offsets import MonthBegin
 from regionmask import mask_geopandas
 from shapely.geometry import box
+import xarray as xr
 
 from ..regions import countries
 from ..utils import XrObj, month_center_range
@@ -86,16 +86,10 @@ def decode_time(ds: xr.Dataset) -> xr.Dataset:
         ref_date = ref_date.tz_convert(None)
     # Create time index
     if delta_units == "years":
-        times = [
-            ref_date + pd.DateOffset(years=year)
-            for year in ds.time.values.astype("int")
-        ]
+        times = [ref_date + pd.DateOffset(years=year) for year in ds.time.values.astype("int")]
         time_idx = pd.DatetimeIndex(times, freq="infer")
     elif delta_units == "months":
-        times = [
-            ref_date + pd.DateOffset(months=month)
-            for month in ds.time.values.astype("int")
-        ]
+        times = [ref_date + pd.DateOffset(months=month) for month in ds.time.values.astype("int")]
         time_idx = pd.DatetimeIndex(times, freq="infer")
     else:
         # Frequencies up to "days" are natively supported by Pandas
@@ -133,9 +127,7 @@ def extend_time_const(obj: XrObj, end_time: str | pd.Timestamp) -> XrObj:
 
     # Detect if provided end time is too small
     if len(pd.date_range(start=times[-1], end=end_time, freq=freq)) <= 1:
-        raise ValueError(
-            f"Invalid `end_time` {end_time}. Must be >= last time step + period."
-        )
+        raise ValueError(f"Invalid `end_time` {end_time}. Must be >= last time step + period.")
 
     # Create extended time range
     ext_times = pd.date_range(start=times[0], end=end_time, freq=freq)
@@ -144,9 +136,7 @@ def extend_time_const(obj: XrObj, end_time: str | pd.Timestamp) -> XrObj:
     return obj.reindex(time=ext_times, method="ffill")
 
 
-def align_time(
-    ds: xr.Dataset, tolerance: pd.Timedelta = pd.Timedelta(days=5)
-) -> xr.Dataset:
+def align_time(ds: xr.Dataset, tolerance: pd.Timedelta = pd.Timedelta(days=5)) -> xr.Dataset:
     """Reindex a dataset with an unevenly spaced time dimension
     (e.g., GRACE products) to a monthly spaced time dimension.
     The values are not interpolated, but taken from the nearest
@@ -172,9 +162,7 @@ def align_time(
     ).dropna("time", how="all")
 
     # Floor all dates to the first day of month
-    time_month_start = (
-        pd.to_datetime(ds.time) + MonthBegin() - MonthBegin(normalize=True)
-    )
+    time_month_start = pd.to_datetime(ds.time) + MonthBegin() - MonthBegin(normalize=True)
     ds = ds.assign(time=time_month_start)
     return ds
 
@@ -252,9 +240,7 @@ def align_time_interp(
     ds = xr.concat([ds_interp, ds_subst], dim="time").sortby("time")
 
     # Floor all dates to the first day of month
-    time_month_start = (
-        pd.to_datetime(ds.time) + MonthBegin() - MonthBegin(normalize=True)
-    )
+    time_month_start = pd.to_datetime(ds.time) + MonthBegin() - MonthBegin(normalize=True)
     ds = ds.assign(time=time_month_start)
 
     return ds

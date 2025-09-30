@@ -120,9 +120,7 @@ class DeepRecDataModule(L.LightningDataModule):
             input_vars = input_vars + inp if inp is not None else input_vars
 
         if not isinstance(target_var, str):
-            raise ValueError(
-                "target_var must be a string (only a single target allowed)."
-            )
+            raise ValueError("target_var must be a string (only a single target allowed).")
 
         inputs = inputs_orig[input_vars]
         # During pre-training the target might be part of the input store
@@ -227,9 +225,7 @@ class DeepRecDataModule(L.LightningDataModule):
 
         # Scale according to train set of selected area
         if scaler is not None:
-            inputs_train = inputs.where(inputs.time.isin(time_train), drop=True).where(
-                mask == 1
-            )
+            inputs_train = inputs.where(inputs.time.isin(time_train), drop=True).where(mask == 1)
             scaler.fit(inputs_train.compute())
             inputs = scaler.transform(inputs)
         # Fill missing values in inputs with zeros (after scaling!)
@@ -293,9 +289,7 @@ class DeepRecDataModule(L.LightningDataModule):
 
     def train_dataloader(self) -> DataLoader:
         if self._train_tensors is None:
-            raise TypeError(
-                "Training tensors have not been prepared. Call setup('fit') first."
-            )
+            raise TypeError("Training tensors have not been prepared. Call setup('fit') first.")
         return DataLoader(
             DeepRecDataset(
                 self._train_tensors,
@@ -323,9 +317,7 @@ class DeepRecDataModule(L.LightningDataModule):
 
     def test_dataloader(self) -> DataLoader:
         if self._test_tensors is None:
-            raise TypeError(
-                "Testing tensors have not been prepared. Call setup('test') first."
-            )
+            raise TypeError("Testing tensors have not been prepared. Call setup('test') first.")
         return DataLoader(
             DeepRecDataset(
                 self._test_tensors,
@@ -338,9 +330,7 @@ class DeepRecDataModule(L.LightningDataModule):
 
     def predict_dataloader(self) -> DataLoader:
         if self._predict_tensors is None:
-            raise TypeError(
-                "Prediction tensors have not been prepared. Call setup('test') first."
-            )
+            raise TypeError("Prediction tensors have not been prepared. Call setup('test') first.")
         return DataLoader(
             DeepRecDataset(
                 self._predict_tensors,
@@ -357,25 +347,15 @@ class DeepRecDataModule(L.LightningDataModule):
         Checks for every time step if all values across lat-lon are NA for
         at least one data variable.
         """
-        time_na = (
-            obj.to_dataarray()
-            .isnull()
-            .all(dim=["lat", "lon"])
-            .any(dim="variable")
-            .compute()
-        )
+        time_na = obj.to_dataarray().isnull().all(dim=["lat", "lon"]).any(dim="variable").compute()
         return ~time_na
 
-    def _verify_dims(
-        self, obj: xr.DataArray | xr.Dataset, dims: list, name: str
-    ) -> None:
+    def _verify_dims(self, obj: xr.DataArray | xr.Dataset, dims: list, name: str) -> None:
         """Equality check between object dimensions and provided dimensions,
         including order."""
         obj_dims = list(obj.dims)
         if obj_dims != dims:
-            raise ValueError(
-                f"Dimensions of {name} must be {dims}, but received {obj_dims}."
-            )
+            raise ValueError(f"Dimensions of {name} must be {dims}, but received {obj_dims}.")
 
     def _verify_time_freq(self, obj: xr.DataArray, name: str) -> None:
         """Check that time indices are un-interupted and monothonically increasing."""
@@ -430,9 +410,7 @@ class DeepRecDataModule(L.LightningDataModule):
             for item in items
         ]
         ends = [
-            item.get_index("time")[-1].date()
-            if len(item.get_index("time")) > 0
-            else "-"
+            item.get_index("time")[-1].date() if len(item.get_index("time")) > 0 else "-"
             for item in items
         ]
         # Calc rel size of data sets (inputs/train)
@@ -471,9 +449,7 @@ class DeepRecDataModule(L.LightningDataModule):
         with dask.config.set({"array.slicing.split_large_chunks": False}):
             if partition == "predict":
                 # Extract DataArray from inputs with length of predictions
-                ones = np.ones(
-                    tuple(self.inputs_predict.sizes.values()), dtype="float32"
-                )
+                ones = np.ones(tuple(self.inputs_predict.sizes.values()), dtype="float32")
                 template = (
                     xr.DataArray(ones, coords=self.inputs_predict.coords)
                     .where(self._mask == 1)
@@ -483,20 +459,14 @@ class DeepRecDataModule(L.LightningDataModule):
             else:
                 # Use target as template
                 template = (
-                    getattr(self, f"target_{partition}")
-                    .dr.stack_spacetime()
-                    .chunk({"sample": -1})
+                    getattr(self, f"target_{partition}").dr.stack_spacetime().chunk({"sample": -1})
                 )
             # Insert predictions into data array
             match pred.ndim:
                 case 1:
                     # Tensor contains only predictions - return data array
                     pred_name = f"pred_{name}" if name else "pred"
-                    xr_pred = (
-                        template.copy(data=pred)
-                        .rename(pred_name)
-                        .dr.unstack_spacetime()
-                    )
+                    xr_pred = template.copy(data=pred).rename(pred_name).dr.unstack_spacetime()
                     xr_pred.attrs = {
                         "long_name": "Predicted Terrestrial Water Storage Anomaly",
                         "standard_name": "twsa_pred",
@@ -587,9 +557,7 @@ class DeepRecDataModule(L.LightningDataModule):
             target = inputs[(self._time_window - 1) :].where(self._mask == 1)
 
         # Merge inputs (don't change time steps)
-        merged = xr.merge(
-            [inputs.rename("inputs"), target.rename("target")], join="left"
-        )
+        merged = xr.merge([inputs.rename("inputs"), target.rename("target")], join="left")
 
         # Assign integer indices
         merged = merged.assign_coords(
@@ -598,9 +566,7 @@ class DeepRecDataModule(L.LightningDataModule):
             lon=np.arange(len(merged.lon)),
         )
         # Create lookup for all samples where target is not NA
-        lookup = (
-            merged.target.dr.stack_spacetime().get_index("sample").to_frame().to_numpy()
-        )
+        lookup = merged.target.dr.stack_spacetime().get_index("sample").to_frame().to_numpy()
 
         # Verify lookup validity: No out of bounds time values allowed
         time_idxs = lookup[:, 0]
@@ -619,9 +585,7 @@ class DeepRecDataModule(L.LightningDataModule):
                 time = getattr(self, f"_time_{partition}")
 
                 if time is None:
-                    raise ValueError(
-                        f"Temporal extend of partition {partition} not specified."
-                    )
+                    raise ValueError(f"Temporal extend of partition {partition} not specified.")
 
                 start = pd.Timestamp(time[0].values)
                 end = pd.Timestamp(time[-1].values)

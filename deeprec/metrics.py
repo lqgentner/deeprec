@@ -127,7 +127,7 @@ def rmse(
     return rmse_
 
 
-def my_pearson_r(
+def pearson_r(
     o: XrObj,
     m: xr.DataArray,
     dim: str | list[str] | None = None,
@@ -259,13 +259,9 @@ def kgeprime(
     with xr.set_options(keep_attrs=keep_attrs):
         m_mean = m.mean(dim, skipna=skipna)
         o_mean = o.mean(dim, skipna=skipna)
-        gamma = (m.std(dim, skipna=skipna) / m_mean) / (
-            o.std(dim, skipna=skipna) / o_mean
-        )
+        gamma = (m.std(dim, skipna=skipna) / m_mean) / (o.std(dim, skipna=skipna) / o_mean)
         beta = m_mean / o_mean
-        kgeprime_ = 1 - xr.ufuncs.sqrt(
-            (r - 1) ** 2 + (gamma - 1) ** 2 + (beta - 1) ** 2
-        )
+        kgeprime_ = 1 - xr.ufuncs.sqrt((r - 1) ** 2 + (gamma - 1) ** 2 + (beta - 1) ** 2)
 
     return kgeprime_
 

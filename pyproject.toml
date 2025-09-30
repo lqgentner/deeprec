@@ -52,16 +52,19 @@ plot = [
 ]
 complete = ["deeprec[download, plot]"]
 
-[tool.setuptools]
-packages = ["deeprec"]
+[dependency-groups]
+dev = [
+    "ruff",
+]
 
-[tool.uv.sources]
-deeprec = { workspace = true }
-
-[build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+[tool.ruff]
+line-length = 99
+src = ["src"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["deeprec"]
 force-sort-within-sections = true
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"

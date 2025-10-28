@@ -1,6 +1,6 @@
 [project]
 name = "deeprec"
-version = "0.2.0"
+version = "1.0.0"
 authors = [
   { name="Luis Quentin Gentner", email="luis.gentner@outlook.com" },
 ]

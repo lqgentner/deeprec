@@ -1,3 +1,6 @@
+[![DOI](https://zenodo.org/badge/887364759.svg)](https://doi.org/10.5281/zenodo.17468617)
+![GitHub License](https://img.shields.io/github/license/lqgentner/deeprec)
+
 # DeepRec: Global Terrestrial Water Storage Reconstruction Since 1941 Using Spatiotemporal-Aware Deep Learning Model
 
 <p align="center">

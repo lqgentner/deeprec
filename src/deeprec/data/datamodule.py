@@ -330,7 +330,9 @@ class DeepRecDataModule(L.LightningDataModule):
 
     def predict_dataloader(self) -> DataLoader:
         if self._predict_tensors is None:
-            raise TypeError("Prediction tensors have not been prepared. Call setup('test') first.")
+            raise TypeError(
+                "Prediction tensors have not been prepared. Call setup('predict') first."
+            )
         return DataLoader(
             DeepRecDataset(
                 self._predict_tensors,

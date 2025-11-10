@@ -43,9 +43,9 @@ savefig.dpi: 450
 # Use inline math for ticks
 text.usetex: True
 # Matplotlib-intern latex preamble (pdflatex)
-text.latex.preamble: \usepackage[T1]{fontenc} \usepackage[utf8]{inputenc} \usepackage{siunitx} \sisetup{detect-all} \usepackage{tgheros} \usepackage[scaled=1.06]{newtxsf} \renewcommand{\familydefault}{\sfdefault} \usepackage{mathastext}
+text.latex.preamble: \usepackage[T1]{fontenc} \usepackage[utf8]{inputenc} \usepackage{siunitx} \usepackage{tgheros} \renewcommand{\familydefault}{\sfdefault} \usepackage[italic]{mathastext}
 # Configure PGF
 pgf.texsystem: lualatex
 pgf.rcfonts: False
-# Use TeX Gyre Heros as main+sans font and as math font with mathastext, replace missing symbols from newtxsf
-pgf.preamble: \usepackage[no-math]{fontspec} \usepackage{amsmath, siunitx} \setmainfont{TeX Gyre Heros} \setsansfont{TeX Gyre Heros} \usepackage[scaled=1.06]{newtxsf} \usepackage[italic]{mathastext} \sisetup{detect-all}
+# Use TeX Gyre Heros (Helvetica) as main and sans font, set as math font with mathastext, uses greek alphabet from Lete Sans Math
+pgf.preamble: \usepackage[no-math]{fontspec} \usepackage{siunitx} \setmainfont{TeX Gyre Heros} \setsansfont{TeX Gyre Heros} \usepackage{lete-sans-math} \usepackage[italic]{mathastext}

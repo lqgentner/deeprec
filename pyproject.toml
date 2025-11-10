@@ -36,7 +36,6 @@ dependencies = [
     "zarr>=2,<3",
     "loguru>=0.7.3",
     "captum>=0.7.0",
-    "shap>=0.48.0",
 ]
 
 [project.optional-dependencies]
@@ -51,6 +50,7 @@ plot = [
     "matplotlib-inline>=0.1.7",
     "seaborn>=0.13.2",
     "cmcrameri>=1.9",
+    "xskillscore>=0.0.27",
 ]
 complete = ["deeprec[download, plot]"]
 

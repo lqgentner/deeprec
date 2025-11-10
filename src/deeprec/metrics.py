@@ -24,12 +24,12 @@ def mae(
     m : DataArray
         Modelled/predicted value array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result. Defaults to None reducing all dimensions.
+        The dimension(s) along which to compute the metric. These dimension(s) will
+        be reduced as a result. Defaults to None, which reduces all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : {"default", True, False}
-        Whether to keep attributes on xarray Datasets/dataarrays after operations. Can be
+        Whether to keep attributes on xarray Datasets/DataArrays after operations. Can be
         - True : to always keep attrs
         - False : to always discard attrs
         - default : to use original logic that attrs should only be kept in unambiguous circumstances
@@ -64,12 +64,12 @@ def mse(
     m : DataArray
         Modelled/predicted value array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result. Defaults to None reducing all dimensions.
+        The dimension(s) along which to compute the metric. These dimension(s) will
+        be reduced as a result. Defaults to None, which reduces all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : {"default", True, False}
-        Whether to keep attributes on xarray Datasets/dataarrays after operations. Can be
+        Whether to keep attributes on xarray Datasets/DataArrays after operations. Can be
         - True : to always keep attrs
         - False : to always discard attrs
         - default : to use original logic that attrs should only be kept in unambiguous circumstances
@@ -104,8 +104,8 @@ def rmse(
     m : DataArray
         Modelled/predicted value array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result. Defaults to None reducing all dimensions.
+        The dimension(s) along which to compute the metric. These dimension(s) will
+        be reduced as a result. Defaults to None, which reduces all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : {"default", True, False}
@@ -144,12 +144,12 @@ def pearson_r(
     m : DataArray
         Modelled/predicted value array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result. Defaults to None reducing all dimensions.
+        The dimension(s) along which to compute the metric. These dimension(s) will
+        be reduced as a result. Defaults to None, which reduces all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : {"default", True, False}
-        Whether to keep attributes on xarray Datasets/dataarrays after operations. Can be
+        Whether to keep attributes on xarray Datasets/DataArrays after operations. Can be
         - True : to always keep attrs
         - False : to always discard attrs
         - default : to use original logic that attrs should only be kept in unambiguous circumstances
@@ -192,12 +192,12 @@ def kge(
     m : DataArray
         Modelled/predicted value array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result. Defaults to None reducing all dimensions.
+        The dimension(s) along which to compute the metric. These dimension(s) will
+        be reduced as a result. Defaults to None, which reduces all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : {"default", True, False}
-        Whether to keep attributes on xarray Datasets/dataarrays after operations. Can be
+        Whether to keep attributes on xarray Datasets/DataArrays after operations. Can be
         - True : to always keep attrs
         - False : to always discard attrs
         - default : to use original logic that attrs should only be kept in unambiguous circumstances
@@ -236,12 +236,12 @@ def kgeprime(
     m : DataArray
         Modelled/predicted value array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result. Defaults to None reducing all dimensions.
+        The dimension(s) along which to compute the metric. These dimension(s) will
+        be reduced as a result. Defaults to None, which reduces all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : {"default", True, False}
-        Whether to keep attributes on xarray Datasets/dataarrays after operations. Can be
+        Whether to keep attributes on xarray Datasets/DataArrays after operations. Can be
         - True : to always keep attrs
         - False : to always discard attrs
         - default : to use original logic that attrs should only be kept in unambiguous circumstances
@@ -285,12 +285,12 @@ def nse(
     m : DataArray
         Modelled/predicted value array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result. Defaults to None reducing all dimensions.
+        The dimension(s) along which to compute the metric. These dimension(s) will
+        be reduced as a result. Defaults to None, which reduces all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : {"default", True, False}
-        Whether to keep attributes on xarray Datasets/dataarrays after operations. Can be
+        Whether to keep attributes on xarray Datasets/DataArrays after operations. Can be
         - True : to always keep attrs
         - False : to always discard attrs
         - default : to use original logic that attrs should only be kept in unambiguous circumstances
@@ -327,12 +327,12 @@ def nsec(
     m : DataArray
         Modelled/predicted value array(s) over which to apply the function.
     dim : str, list
-        The dimension(s) to apply the correlation along. Note that this dimension will
-        be reduced as a result. Defaults to None reducing all dimensions.
+        The dimension(s) along which to compute the metric. These dimension(s) will
+        be reduced as a result. Defaults to None, which reduces all dimensions.
     skipna : bool
         If True, skip NaNs when computing function.
     keep_attrs : {"default", True, False}
-        Whether to keep attributes on xarray Datasets/dataarrays after operations. Can be
+        Whether to keep attributes on xarray Datasets/DataArrays after operations. Can be
         - True : to always keep attrs
         - False : to always discard attrs
         - default : to use original logic that attrs should only be kept in unambiguous circumstances

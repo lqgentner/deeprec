@@ -26,9 +26,7 @@ def main() -> None:
     )
     parser.add_argument("project")
     parser.add_argument("run_id")
-    parser.add_argument(
-        "-a", "--alias", default="best", help="'best', 'latest', or 'v<int>'"
-    )
+    parser.add_argument("-a", "--alias", default="best", help="'best', 'latest', or 'v<int>'")
     parser.add_argument(
         "-s",
         "--store",
@@ -45,9 +43,7 @@ def main() -> None:
     )
 
 
-def predict(
-    wandb_project: str, wandb_run_id: str, zarr_store: str, alias: str = "best"
-) -> None:
+def predict(wandb_project: str, wandb_run_id: str, zarr_store: str, alias: str = "best") -> None:
     # Use TensorFloat32 datatype
     torch.set_float32_matmul_precision("high")
 
@@ -56,21 +52,17 @@ def predict(
     run = api.run(f"{wandb_project}/{wandb_run_id}")
 
     # Download checkpoint
-    ckpt_file = wandb_checkpoint_download(
-        project=wandb_project, run_id=wandb_run_id, alias=alias
-    )
+    ckpt_file = wandb_checkpoint_download(project=wandb_project, run_id=wandb_run_id, alias=alias)
 
     # Get config
     config = run.config
 
     # Model creation
     model_class = locate(config["model"]["class_path"])
-    if isinstance(model_class, L.LightningModule):
+    if issubclass(model_class, L.LightningModule):
         model = model_class.load_from_checkpoint(ckpt_file, **config["model"])
     else:
-        raise TypeError(
-            f"Provided class_path '{model_class}' is not a LightningModule."
-        )
+        raise TypeError(f"Provided class_path '{model_class}' is not a LightningModule.")
 
     # Data creation
     dm = DeepRecDataModule(**config["data"])

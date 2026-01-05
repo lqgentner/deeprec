@@ -9,7 +9,7 @@
 
 ## Description
 
-This repository contains the code used to create the results presented in "[DeepRec: Global Terrestrial Water Storage Reconstruction Since 1941 Using Spatiotemporal-Aware Deep Learning Model](https://doi.org/10.22541/essoar.175138855.54947789/v1)". It includes scripts and notebooks to download the input and target data, train the models, write the final dataset, and create the plots for the publication. The resulting dataset is available on [Zenodo](https://doi.org/10.5281/zenodo.15681365).
+This repository contains the code used to create the results presented in "[DeepRec: Global Terrestrial Water Storage Reconstruction Since 1941 Using Spatiotemporal-Aware Deep Learning Model](https://doi.org/10.1029/2025JH000889)". It includes scripts and notebooks to download the input and target data, train the models, write the final dataset, and create the plots for the publication. The resulting dataset is available on [Zenodo](https://doi.org/10.5281/zenodo.15681365).
 
 The data processing and model training is implemented in Python and heavily depends on the packages [xarray](https://docs.xarray.dev/en/stable/), [PyTorch](https://pytorch.org/docs/stable/index.html), and [PyTorch Lightning](https://lightning.ai/docs/pytorch/stable/).
 
@@ -148,16 +148,21 @@ To replicate our analysis, run the scripts in the folder of the same name.
 
 ## Citation
 
-If you use any code of this repository, please cite our preprint:
+If you use any code of this repository, please cite our paper:
 
-> Luis Q. Gentner, Junyang Gou, Mohammad J. Tourian, et al. DeepRec: Global Terrestrial Water Storage Reconstruction Since 1941 Using Spatiotemporal-Aware Deep Learning Model. *ESS Open Archive*. July 01, 2025.
+> Gentner, L. Q., Gou, J., Tourian, M. J., Börger, L., Sneeuw, N., & Soja, B. (2026).
+  DeepRec: Global terrestrial water storage reconstruction since 1941 using spatiotemporal-aware deep learning model.
+  *Journal of Geophysical Research: Machine Learning and Computation*, 3, e2025JH000889.
+  https://doi.org/10.1029/2025JH000889
 
-    @article{gentner2025deeprec,
-        title={DeepRec: Global Terrestrial Water Storage Reconstruction Since 1941 Using Spatiotemporal-Aware Deep Learning Model},
-        url={http://dx.doi.org/10.22541/essoar.175138855.54947789/v1},
-        doi={10.22541/essoar.175138855.54947789/v1},
-        publisher={Wiley},
-        author={Gentner, Luis Q. and Gou, Junyang and Tourian, Mohammad J. and Börger, Lara and Sneeuw, Nico and Soja, Benedikt},
-        year={2025},
-        month=jul
+    @article{gentner2026deeprec,
+        author = {Gentner, Luis Q. and Gou, Junyang and Tourian, Mohammad J. and Börger, Lara and Sneeuw, Nico and Soja, Benedikt},
+        title = {DeepRec: Global terrestrial water storage reconstruction since 1941 using spatiotemporal-aware deep learning model},
+        journal = {Journal of Geophysical Research: Machine Learning and Computation},
+        volume = {3},
+        number = {1},
+        pages = {e2025JH000889},
+        doi = {10.1029/2025JH000889},
+        url = {https://doi.org/10.1029/2025JH000889},
+        year = {2026}
     }
